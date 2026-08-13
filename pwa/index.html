@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b7a4b">
+<meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
+<title>Shopping App · v0.01</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-180.png">
+<style>
+:root{
+  --bg:#f4f6f5; --bg2:#ffffff; --card:#ffffff; --ink:#15201b; --ink2:#5c6b63;
+  --line:#e4e9e6; --accent:#0b7a4b; --accent2:#0e9f63; --danger:#e01a22;
+  --coles:#e3001b; --wool:#007a46; --aldi:#0f3a8c;
+  --shadow:0 1px 2px rgba(20,40,30,.05),0 6px 20px rgba(20,40,30,.06);
+  --radius:16px;
+  --tabbar-h:64px;
+}
+[data-theme="dark"]{
+  --bg:#0e1512; --bg2:#121b17; --card:#162019; --ink:#e7efe9; --ink2:#93a49a;
+  --line:#233029; --accent:#2fbf80; --accent2:#3fd391; --danger:#ff5a63;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.45;
+  -webkit-font-smoothing:antialiased; font-size:16px;
+}
+#app{max-width:560px;margin:0 auto;padding:0 14px calc(var(--tabbar-h) + 30px)}
+a{color:var(--accent)}
+button{font-family:inherit}
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;background:var(--bg);
+  padding:14px 2px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.topbar h1{font-size:19px;margin:0;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.logo svg{width:17px;height:17px}
+.sync-badge{font-size:11px;color:var(--ink2);display:flex;align-items:center;gap:5px;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#4caf50;box-shadow:0 0 0 3px rgba(76,175,80,.18)}
+.dot.off{background:#f0a020;box-shadow:0 0 0 3px rgba(240,160,32,.18)}
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;margin:0 0 10px;letter-spacing:-.2px}
+.muted{color:var(--ink2);font-size:13px}
+.hint{color:var(--ink2);font-size:12.5px;margin:4px 0 0}
+/* ---------- summary ---------- */
+.summary-total{display:flex;align-items:baseline;gap:8px;margin:2px 0 10px}
+.summary-total .big{font-size:34px;font-weight:800;letter-spacing:-1px}
+.summary-total .save{font-size:13px;color:var(--accent);font-weight:700}
+.store-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;
+  font-size:13px;font-weight:700;border:1.5px solid var(--line);background:var(--bg2)}
+.chip .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.chip .sub{color:var(--ink2);font-weight:600}
+/* ---------- progress ---------- */
+.progress{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 6px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:999px;transition:width .25s ease;width:0}
+/* ---------- specials strip ---------- */
+.special-strip{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#fff7ec,#fff1f1);
+  border:1px solid #ffe0c2;border-radius:12px;padding:11px 13px;margin-bottom:14px;cursor:pointer}
+[data-theme="dark"] .special-strip{background:#241a12;border-color:#3a2b1a}
+.special-strip .fx{font-size:19px}
+.special-strip b{font-size:13.5px}
+.special-strip span{font-size:12.5px;color:var(--ink2)}
+/* ---------- store groups ---------- */
+.store-group{margin-bottom:18px}
+.store-head{display:flex;align-items:center;gap:9px;padding:0 2px 8px}
+.store-head .sw{width:14px;height:14px;border-radius:5px;flex:0 0 auto}
+.store-head .nm{font-weight:800;font-size:15px;letter-spacing:-.2px}
+.store-head .ct{font-size:12px;color:var(--ink2)}
+.store-head .st{margin-left:auto;font-weight:800;font-size:14px}
+/* ---------- list rows ---------- */
+.rows{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.row{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+.row:last-child{border-bottom:0}
+.row:active{background:var(--bg2)}
+.row.checked .nm{text-decoration:line-through;color:var(--ink2)}
+.row.checked .meta{opacity:.55}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid #c9d4cd;flex:0 0 auto;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+[data-theme="dark"] .check{border-color:#3a4a40}
+.check svg{width:13px;height:13px;opacity:0}
+.row.checked .check{background:var(--accent);border-color:var(--accent)}
+.row.checked .check svg{opacity:1}
+.row .main{flex:1;min-width:0}
+.row .nm{font-weight:700;font-size:15px;letter-spacing:-.2px}
+.row .sub{font-size:12.5px;color:var(--ink2);margin-top:1px}
+.row .right{text-align:right;flex:0 0 auto}
+.row .price{font-weight:800;font-size:15px}
+.row .unit{font-size:11.5px;color:var(--ink2)}
+.badge{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;margin-top:3px;letter-spacing:.2px}
+.badge.special{background:#ffe1e3;color:#c00}
+[data-theme="dark"] .badge.special{background:#3a1416;color:#ff9aa0}
+.badge.aldi{background:#e1e8ff;color:#0f3a8c}
+[data-theme="dark"] .badge.aldi{background:#14214a;color:#9db2ff}
+.badge.move{background:#e3f6ec;color:#0b7a4b}
+[data-theme="dark"] .badge.move{background:#12331f;color:#6fd7a3}
+.badge.manual{background:#f0f0f0;color:#5c6b63}
+[data-theme="dark"] .badge.manual{background:#232323;color:#a9b3ad}
+.why{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:2px}
+/* ---------- empty / onboarding ---------- */
+.empty{padding:34px 20px;text-align:center;color:var(--ink2)}
+.empty .fx{font-size:44px;margin-bottom:8px}
+.empty b{color:var(--ink);font-size:16px}
+.onboard-step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;text-align:left}
+.onboard-step .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+.onboard-step b{font-size:14px}
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;
+  padding:12px 16px;font-size:14.5px;font-weight:700;cursor:pointer;transition:transform .06s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:#fff;width:100%}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.soft{background:var(--bg2);color:var(--ink);border:1.5px solid var(--line)}
+.btn.danger{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.5}
+.btnrow{display:flex;gap:9px}
+.btnrow .btn{flex:1}
+/* ---------- segmented ---------- */
+.seg{display:flex;background:var(--bg2);border:1.5px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:9px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--ink2);cursor:pointer}
+.seg button.on{background:var(--accent);color:#fff}
+/* ---------- tabs ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
+  border-top:1px solid var(--line);display:flex;max-width:560px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;background:none;border:0;padding:9px 2px 7px;color:var(--ink2);font-size:10.5px;
+  font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button.on{color:var(--accent)}
+/* ---------- forms ---------- */
+input[type=text],input[type=number],textarea,select{
+  width:100%;border:1.5px solid var(--line);border-radius:11px;background:var(--bg2);color:var(--ink);
+  padding:11px 12px;font-size:15px;font-family:inherit}
+textarea{min-height:92px;resize:vertical}
+label.f{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:12px 0 5px}
+.field-row{display:flex;gap:8px;align-items:center}
+.field-row input{flex:1}
+.ing-row{display:flex;gap:7px;margin-bottom:8px}
+.ing-row input{font-size:14px;padding:9px 10px}
+.ing-row .q{width:64px;flex:0 0 auto}
+.ing-row .u{width:88px;flex:0 0 auto}
+.ing-row .x{width:34px;flex:0 0 auto;padding:9px 0;color:var(--danger)}
+/* ---------- recipe list ---------- */
+.recipe{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.recipe:last-child{border-bottom:0}
+.recipe .av{width:40px;height:40px;border-radius:12px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto}
+.recipe .main{flex:1;min-width:0}
+.recipe .nm{font-weight:700;font-size:15px}
+.recipe .sub{font-size:12px;color:var(--ink2)}
+.recipe .ch{color:var(--ink2);font-size:18px}
+/* ---------- day rows ---------- */
+.dayrow{border-bottom:1px solid var(--line);padding:12px 0}
+.dayrow:last-child{border-bottom:0}
+.dayrow .dt{display:flex;align-items:center;gap:8px}
+.dayrow .dt b{font-size:14px}
+.dayrow .dt .add{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:0}
+.mealchip{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1.5px solid var(--line);
+  border-radius:999px;padding:5px 6px 5px 12px;margin:6px 6px 0 0;font-size:13px;font-weight:600}
+.mealchip .srv{color:var(--ink2);font-weight:700}
+.mealchip .rm{width:20px;height:20px;border-radius:50%;background:var(--line);color:var(--ink);border:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+/* ---------- modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(10,20,15,.5);z-index:60;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px 24px;
+  max-height:82vh;overflow-y:auto}
+.sheet h3{margin:0 0 12px;font-size:16px;letter-spacing:-.2px}
+/* ---------- slider ---------- */
+input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+.slider-labels{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink2);font-weight:700;margin-top:-4px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.toggle-row:last-child{border-bottom:0}
+.toggle-row .l{font-size:14.5px;font-weight:600}
+.toggle-row .s{font-size:12px;color:var(--ink2)}
+.switch{position:relative;width:48px;height:28px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0}
+.switch .tk{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:.2s;cursor:pointer}
+.switch .tk:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked + .tk{background:var(--accent)}
+.switch input:checked + .tk:before{transform:translateX(20px)}
+.setting-note{font-size:12px;color:var(--ink2);margin-top:2px}
+/* ---------- misc ---------- */
+.hr{height:1px;background:var(--line);margin:14px 0}
+.kv{display:flex;justify-content:space-between;padding:8px 0;font-size:14px}
+.kv b{font-weight:600}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
+  padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;z-index:80;pointer-events:none;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.screen{display:none}
+.screen.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.store-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+@media (min-width:600px){.tabbar{border-radius:0}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <h1><span class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+    </span>Shopping<span style="color:var(--ink2);font-weight:600">App</span></h1>
+    <span class="sync-badge" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">synced</span></span>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen on" id="screen-home">
+    <div id="homeContent"></div>
+  </section>
+
+  <!-- ============ PLAN ============ -->
+  <section class="screen" id="screen-plan">
+    <div class="card">
+      <h2>Meal prep period</h2>
+      <div class="seg" id="periodSeg">
+        <button data-period="7" class="on">1 week</button>
+        <button data-period="14">2 weeks</button>
+      </div>
+      <p class="hint" id="periodHint"></p>
+    </div>
+    <div class="card" id="planCard">
+      <h2 id="planHeading">Your plan</h2>
+      <div id="planDays"></div>
+    </div>
+    <div class="card" id="planTotals" style="display:none">
+      <div class="kv"><span>Meals planned</span><b id="ptMeals">0</b></div>
+      <div class="kv"><span>Distinct ingredients</span><b id="ptIngs">0</b></div>
+      <div class="kv"><span>Est. weekly cost</span><b id="ptCost">—</b></div>
+    </div>
+  </section>
+
+  <!-- ============ RECIPES ============ -->
+  <section class="screen" id="screen-recipes">
+    <div class="card">
+      <h2>Paste a recipe 🪄</h2>
+      <textarea id="pasteBox" placeholder="e.g. Chicken stir fry&#10;500g chicken breast&#10;2 cups rice&#10;1 broccoli head&#10;3 tbsp soy sauce&#10;1 capsicum&#10;2 cloves garlic"></textarea>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn soft" id="parseBtn">Parse</button>
+        <button class="btn primary" id="saveParsedBtn" disabled>Save as recipe</button>
+      </div>
+      <div id="parsePreview"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h2 style="margin:0">My recipes</h2>
+        <button class="btn sm soft" id="newRecipeBtn">+ New</button>
+      </div>
+      <div id="recipeList"></div>
+    </div>
+  </section>
+
+  <!-- ============ SPECIALS ============ -->
+  <section class="screen" id="screen-specials">
+    <div id="specialsContent"></div>
+  </section>
+
+  <!-- ============ MORE ============ -->
+  <section class="screen" id="screen-more">
+    <div class="card">
+      <h2>Stores</h2>
+      <div class="toggle-row">
+        <div><div class="l">Coles</div><div class="s">Full-line prices, scraped nightly</div></div>
+        <label class="switch"><input type="checkbox" id="stColes"><span class="tk"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="l">Woolworths</div><div class="s">Full-line prices, scraped nightly</div></div>
+        <label class="switch"><input type="checkbox" id="stWool"><span class="tk"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="l">Aldi</div><div class="s">Weekly Special Buys only</div></div>
+        <label class="switch"><input type="checkbox" id="stAldi"><span class="tk"></span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Split strategy</h2>
+      <div class="slider-labels"><span>🧍 Fewest trips</span><span>💰 Cheapest</span></div>
+      <input type="range" id="splitSlider" min="0" max="100" value="75">
+      <label class="f" style="margin-top:6px">Minimum saving to move an item ($)</label>
+      <input type="number" id="minSaving" min="0" step="0.5" value="2">
+      <label class="f">Max stores per shop</label>
+      <select id="maxStores"><option>2</option><option selected>3</option></select>
+      <p class="hint">Items only move to another store when the saving clears your threshold, and never beyond your store cap.</p>
+    </div>
+
+    <div class="card">
+      <h2>Appearance</h2>
+      <div class="seg" id="themeSeg">
+        <button data-theme-val="auto">Auto</button>
+        <button data-theme-val="light">Light</button>
+        <button data-theme-val="dark">Dark</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Data</h2>
+      <div class="btnrow">
+        <button class="btn soft" id="exportBtn">Export</button>
+        <button class="btn soft" id="importBtn">Import</button>
+        <button class="btn danger" id="resetBtn">Reset all</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+      <p class="hint" id="priceFreshness" style="margin-top:10px"></p>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <p class="muted">Shopping App · <b>v0.01</b></p>
+      <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- modal -->
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab="home" class="on">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1.5"/><circle cx="18" cy="21" r="1.5"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+    Shop
+  </button>
+  <button data-tab="plan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Plan
+  </button>
+  <button data-tab="recipes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Recipes
+  </button>
+  <button data-tab="specials">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.6 6.1.6-4.6 4 1.3 6-5.2-3.2L6.8 18l1.3-6-4.6-4 6.1-.6z"/></svg>
+    Specials
+  </button>
+  <button data-tab="more">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+    More
+  </button>
+</nav>
+
+<script>
+/* ============================================================
+   SHOPPING APP — v0.01
+   Local-first PWA. Meal plan → aggregated ingredients → price-
+   optimised shopping lists split across Coles / Woolworths / Aldi.
+   ============================================================ */
+"use strict";
+const APP_VERSION = "v0.01";
+const LS = (typeof localStorage !== "undefined") ? localStorage : null;
+
+/* ---------------- helpers ---------------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function fmtAUD(x){ return "$" + (Math.round(x*100)/100).toFixed(2); }
+function fmtAUD2(x){ const v = Math.round(x*100)/100; return v.toFixed(2); }
+function uid(){ return "id" + Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4); }
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h<<5)-h+s.charCodeAt(i); h|=0; } return String(Math.abs(h)); }
+function qtyNum(n){ return Math.round(n*100)/100; }
+
+/* ---------------- catalogue ---------------- */
+/* q = pack size (in u), u = unit (kg|L|each), p = price, w = wasPrice,
+   s = onSpecial, l = loose (buy exact qty, price per u) */
+const CAT = [
+  // --- Meat & poultry ---
+  {id:"chicken-breast", name:"Chicken Breast", kind:"weight", aliases:["chicken breast","chicken breast fillet","chicken fillet","breast fillet"],
+    coles:{n:"Coles Chicken Breast Fillets", q:0.5, u:"kg", p:6.00, w:7.50, s:true, promo:"Down Down"},
+    wool:{n:"Woolworths Chicken Breast Fillets", q:1, u:"kg", p:11.00, w:12.00}},
+  {id:"chicken-thigh", name:"Chicken Thigh Fillets", kind:"weight", aliases:["chicken thigh","thigh fillet","chicken thighs"],
+    coles:{n:"Coles Chicken Thigh Fillets", q:0.5, u:"kg", p:5.50, w:6.50, s:false},
+    wool:{n:"Woolworths Chicken Thigh Fillets", q:1, u:"kg", p:10.50, w:11.00}},
+  {id:"beef-mince", name:"Beef Mince", kind:"weight", aliases:["beef mince","minced beef","mince","ground beef"],
+    coles:{n:"Coles 3 Star Beef Mince", q:0.5, u:"kg", p:6.50, w:7.00, s:false},
+    wool:{n:"Woolworths Beef Mince", q:1, u:"kg", p:12.00, w:12.50}},
+  {id:"bacon", name:"Bacon", kind:"weight", aliases:["bacon","bacon rashers","bacon middle"],
+    coles:{n:"Coles Middle Bacon", q:0.2, u:"kg", p:3.80, w:4.20, s:false},
+    wool:{n:"Woolworths Middle Bacon", q:0.2, u:"kg", p:4.20, w:4.50}},
+  {id:"sausages", name:"Beef Sausages", kind:"weight", aliases:["sausages","beef sausages","snags","sausage"],
+    coles:{n:"Coles Beef Sausages", q:0.6, u:"kg", p:5.50, w:6.00, s:false},
+    wool:{n:"Woolworths Beef Sausages", q:0.6, u:"kg", p:5.80, w:6.20}},
+  {id:"salmon", name:"Salmon Fillets", kind:"weight", aliases:["salmon","salmon fillet","salmon fillets"],
+    coles:{n:"Coles Tasmanian Salmon Fillets", q:0.24, u:"kg", p:9.00, w:10.00, s:false},
+    wool:{n:"Woolworths Salmon Fillets", q:0.24, u:"kg", p:9.50, w:10.50}},
+  {id:"tuna", name:"Tinned Tuna", kind:"count", aliases:["tuna","tinned tuna","canned tuna","tuna can"],
+    coles:{n:"Coles Tuna in Springwater 95g", q:1, u:"each", p:1.00, w:1.10, s:false},
+    wool:{n:"Woolworths Tuna 95g", q:1, u:"each", p:1.10, w:1.20}},
+
+  // --- Dairy & eggs ---
+  {id:"eggs", name:"Eggs", kind:"count", aliases:["eggs","egg","free range eggs","dozen eggs"],
+    coles:{n:"Coles Free Range Eggs 12pk", q:12, u:"each", p:4.50, w:5.60, s:false},
+    wool:{n:"Woolworths Free Range Eggs 12pk", q:12, u:"each", p:4.80, w:5.80}},
+  {id:"milk", name:"Milk", kind:"volume", aliases:["milk","full cream milk","skim milk","lite milk"],
+    coles:{n:"Coles Full Cream Milk", q:2, u:"L", p:3.10, w:3.30, s:false},
+    wool:{n:"Woolworths Full Cream Milk", q:2, u:"L", p:3.10, w:3.30}},
+  {id:"butter", name:"Butter", kind:"weight", aliases:["butter"],
+    coles:{n:"Coles Butter", q:0.25, u:"kg", p:3.20, w:3.60, s:false},
+    wool:{n:"Woolworths Butter", q:0.25, u:"kg", p:3.40, w:3.60}},
+  {id:"cheddar", name:"Cheddar Cheese", kind:"weight", aliases:["cheddar","cheese","tasty cheese","cheddar cheese"],
+    coles:{n:"Coles Tasty Cheddar Block", q:0.5, u:"kg", p:5.50, w:6.50, s:false},
+    wool:{n:"Woolworths Cheddar Block", q:0.5, u:"kg", p:5.80, w:6.50}},
+  {id:"mozzarella", name:"Mozzarella", kind:"weight", aliases:["mozzarella","mozzarella cheese","pizza cheese"],
+    coles:{n:"Coles Shredded Mozzarella", q:0.5, u:"kg", p:5.80, w:6.30, s:false},
+    wool:{n:"Woolworths Mozzarella", q:0.5, u:"kg", p:6.00, w:6.50}},
+  {id:"yoghurt", name:"Greek Yoghurt", kind:"weight", aliases:["yoghurt","greek yoghurt","yogurt","greek yogurt"],
+    coles:{n:"Coles Greek Yoghurt", q:1, u:"kg", p:5.00, w:5.50, s:false},
+    wool:{n:"Woolworths Greek Yoghurt", q:1, u:"kg", p:5.20, w:5.60}},
+  {id:"cream", name:"Cream", kind:"volume", aliases:["cream","thickened cream","pouring cream"],
+    coles:{n:"Coles Thickened Cream", q:0.3, u:"L", p:2.80, w:3.00, s:false},
+    wool:{n:"Woolworths Cream", q:0.3, u:"L", p:3.00, w:3.20}},
+
+  // --- Produce ---
+  {id:"broccoli", name:"Broccoli", kind:"count", aliases:["broccoli","broccoli head","broccoli florets"],
+    coles:{n:"Coles Broccoli", q:1, u:"each", p:2.90, l:true}, wool:{n:"Woolworths Broccoli", q:1, u:"each", p:3.20, l:true}},
+  {id:"carrots", name:"Carrots", kind:"weight", aliases:["carrot","carrots"],
+    coles:{n:"Coles Carrots (loose)", q:1, u:"kg", p:1.90, l:true}, wool:{n:"Woolworths Carrots", q:1, u:"kg", p:2.00, l:true}},
+  {id:"onion", name:"Brown Onion", kind:"weight", aliases:["onion","onions","brown onion","brown onions"],
+    coles:{n:"Coles Brown Onions", q:1, u:"kg", p:2.50, l:true}, wool:{n:"Woolworths Brown Onions", q:1, u:"kg", p:2.70, l:true}},
+  {id:"potato", name:"Potatoes", kind:"weight", aliases:["potato","potatoes","spud","spuds"],
+    coles:{n:"Coles Washed Potatoes", q:1, u:"kg", p:2.80, l:true}, wool:{n:"Woolworths Washed Potatoes", q:1, u:"kg", p:3.00, l:true}},
+  {id:"sweet-potato", name:"Sweet Potato", kind:"weight", aliases:["sweet potato","sweet potatoes","kumara"],
+    coles:{n:"Coles Sweet Potatoes", q:1, u:"kg", p:3.90, l:true}, wool:{n:"Woolworths Sweet Potatoes", q:1, u:"kg", p:4.20, l:true}},
+  {id:"spinach", name:"Baby Spinach", kind:"weight", aliases:["spinach","baby spinach","spinach leaves"],
+    coles:{n:"Coles Baby Spinach 120g", q:0.12, u:"kg", p:2.50, w:2.80, s:false},
+    wool:{n:"Woolworths Baby Spinach 120g", q:0.12, u:"kg", p:2.80, w:3.00}},
+  {id:"lettuce", name:"Lettuce", kind:"count", aliases:["lettuce","iceberg","cos lettuce","iceberg lettuce"],
+    coles:{n:"Coles Iceberg Lettuce", q:1, u:"each", p:2.20, l:true}, wool:{n:"Woolworths Iceberg Lettuce", q:1, u:"each", p:2.50, l:true}},
+  {id:"capsicum", name:"Capsicum", kind:"count", aliases:["capsicum","capsicums","red capsicum","bell pepper","pepper","peppers"],
+    coles:{n:"Coles Red Capsicum", q:1, u:"each", p:1.50, l:true}, wool:{n:"Woolworths Capsicum", q:1, u:"each", p:1.80, l:true}},
+  {id:"cucumber", name:"Cucumber", kind:"count", aliases:["cucumber","cucumbers","lebanese cucumber"],
+    coles:{n:"Coles Cucumber", q:1, u:"each", p:1.80, l:true}, wool:{n:"Woolworths Cucumber", q:1, u:"each", p:2.00, l:true}},
+  {id:"tomato", name:"Tomatoes", kind:"weight", aliases:["tomato","tomatoes","truss tomato","cherry tomatoes","cherry tomato"],
+    coles:{n:"Coles Tomatoes", q:1, u:"kg", p:3.50, l:true}, wool:{n:"Woolworths Tomatoes", q:1, u:"kg", p:3.90, l:true}},
+  {id:"avocado", name:"Avocado", kind:"count", aliases:["avocado","avocados","avo"],
+    coles:{n:"Coles Avocado", q:1, u:"each", p:1.70, l:true}, wool:{n:"Woolworths Avocado", q:1, u:"each", p:2.00, l:true}},
+  {id:"banana", name:"Bananas", kind:"weight", aliases:["banana","bananas"],
+    coles:{n:"Coles Bananas", q:1, u:"kg", p:2.50, l:true}, wool:{n:"Woolworths Bananas", q:1, u:"kg", p:2.80, l:true}},
+  {id:"apple", name:"Apples", kind:"weight", aliases:["apple","apples","red apple","green apple","granny smith"],
+    coles:{n:"Coles Apples", q:1, u:"kg", p:3.50, l:true}, wool:{n:"Woolworths Apples", q:1, u:"kg", p:3.80, l:true}},
+  {id:"orange", name:"Oranges", kind:"weight", aliases:["orange","oranges","navel orange"],
+    coles:{n:"Coles Navel Oranges", q:1, u:"kg", p:3.00, l:true}, wool:{n:"Woolworths Oranges", q:1, u:"kg", p:3.30, l:true}},
+  {id:"lemon", name:"Lemons", kind:"count", aliases:["lemon","lemons"],
+    coles:{n:"Coles Lemons", q:1, u:"each", p:0.60, l:true}, wool:{n:"Woolworths Lemons", q:1, u:"each", p:0.75, l:true}},
+  {id:"lime", name:"Limes", kind:"count", aliases:["lime","limes"],
+    coles:{n:"Coles Limes", q:1, u:"each", p:0.80, l:true}, wool:{n:"Woolworths Limes", q:1, u:"each", p:0.90, l:true}},
+  {id:"garlic", name:"Garlic", kind:"count", aliases:["garlic","garlic cloves","clove garlic","garlic bulb","cloves garlic"],
+    coles:{n:"Coles Garlic", q:1, u:"each", p:0.80, l:true}, wool:{n:"Woolworths Garlic", q:1, u:"each", p:0.95, l:true}},
+  {id:"ginger", name:"Ginger", kind:"weight", aliases:["ginger","fresh ginger"],
+    coles:{n:"Coles Ginger", q:1, u:"kg", p:22.00, l:true}, wool:{n:"Woolworths Ginger", q:1, u:"kg", p:24.00, l:true}},
+  {id:"chilli", name:"Chilli", kind:"count", aliases:["chilli","chillies","red chilli","chili"],
+    coles:{n:"Coles Red Chillies", q:1, u:"each", p:0.50, l:true}, wool:{n:"Woolworths Chilli", q:1, u:"each", p:0.60, l:true}},
+  {id:"mushrooms", name:"Mushrooms", kind:"weight", aliases:["mushroom","mushrooms","button mushrooms","cup mushrooms"],
+    coles:{n:"Coles Cup Mushrooms", q:1, u:"kg", p:10.00, l:true}, wool:{n:"Woolworths Mushrooms", q:1, u:"kg", p:11.00, l:true}},
+  {id:"spring-onion", name:"Spring Onions", kind:"count", aliases:["spring onion","spring onions","shallots","scallions","green onion"],
+    coles:{n:"Coles Spring Onions (bunch)", q:1, u:"each", p:1.80, l:true}, wool:{n:"Woolworths Spring Onions", q:1, u:"each", p:2.00, l:true}},
+
+  // --- Pantry ---
+  {id:"rice", name:"White Rice", kind:"weight", aliases:["rice","white rice","basmati rice","jasmine rice","long grain rice"],
+    coles:{n:"Coles White Rice", q:1, u:"kg", p:2.00, w:2.20, s:false}, wool:{n:"Woolworths Long Grain Rice", q:1, u:"kg", p:2.10, w:2.20}},
+  {id:"pasta", name:"Pasta", kind:"weight", aliases:["pasta","spaghetti","penne","fettuccine","macaroni","pasta penne"],
+    coles:{n:"Coles Spaghetti 500g", q:0.5, u:"kg", p:1.20, w:1.40, s:false}, wool:{n:"Woolworths Pasta 500g", q:0.5, u:"kg", p:1.20, w:1.40}},
+  {id:"pasta-sauce", name:"Pasta Sauce", kind:"weight", aliases:["pasta sauce","bolognese sauce","tomato pasta sauce","napolitana"],
+    coles:{n:"Coles Pasta Sauce 500g", q:0.5, u:"kg", p:2.00, w:2.40, s:false}, wool:{n:"Woolworths Pasta Sauce", q:0.5, u:"kg", p:2.20, w:2.50}},
+  {id:"tinned-tomatoes", name:"Diced Tomatoes", kind:"weight", aliases:["tinned tomatoes","diced tomatoes","canned tomatoes","chopped tomatoes","crushed tomatoes"],
+    coles:{n:"Coles Diced Tomatoes 400g", q:0.4, u:"kg", p:0.95, w:1.10, s:false}, wool:{n:"Woolworths Diced Tomatoes", q:0.4, u:"kg", p:1.00, w:1.15}},
+  {id:"tomato-paste", name:"Tomato Paste", kind:"weight", aliases:["tomato paste","tomato puree","tomato purée"],
+    coles:{n:"Coles Tomato Paste 140g", q:0.14, u:"kg", p:1.10, w:1.30, s:false}, wool:{n:"Woolworths Tomato Paste", q:0.14, u:"kg", p:1.20, w:1.40}},
+  {id:"baked-beans", name:"Baked Beans", kind:"weight", aliases:["baked beans","beans"],
+    coles:{n:"Coles Baked Beans 420g", q:0.42, u:"kg", p:1.30, w:1.50, s:false}, wool:{n:"Woolworths Baked Beans", q:0.42, u:"kg", p:1.40, w:1.60}},
+  {id:"chickpeas", name:"Chickpeas", kind:"weight", aliases:["chickpeas","chickpea","chick peas","garbanzo"],
+    coles:{n:"Coles Chickpeas 400g", q:0.4, u:"kg", p:1.00, w:1.20, s:false}, wool:{n:"Woolworths Chickpeas", q:0.4, u:"kg", p:1.10, w:1.30}},
+  {id:"black-beans", name:"Black Beans", kind:"weight", aliases:["black beans","black bean","kidney beans","red kidney beans","cannellini"],
+    coles:{n:"Coles Black Beans 400g", q:0.4, u:"kg", p:1.10, w:1.30, s:false}, wool:{n:"Woolworths Black Beans", q:0.4, u:"kg", p:1.20, w:1.40}},
+  {id:"lentils", name:"Lentils", kind:"weight", aliases:["lentils","red lentils","green lentils","dried lentils"],
+    coles:{n:"Coles Red Lentils 375g", q:0.375, u:"kg", p:1.80, w:2.00, s:false}, wool:{n:"Woolworths Lentils", q:0.375, u:"kg", p:1.90, w:2.10}},
+  {id:"flour", name:"Plain Flour", kind:"weight", aliases:["flour","plain flour","self raising flour","self-raising flour"],
+    coles:{n:"Coles Plain Flour", q:1, u:"kg", p:1.60, w:1.80, s:false}, wool:{n:"Woolworths Plain Flour", q:1, u:"kg", p:1.70, w:1.80}},
+  {id:"sugar", name:"White Sugar", kind:"weight", aliases:["sugar","white sugar","caster sugar","brown sugar"],
+    coles:{n:"Coles White Sugar", q:1, u:"kg", p:1.70, w:1.90, s:false}, wool:{n:"Woolworths Sugar", q:1, u:"kg", p:1.80, w:1.90}},
+  {id:"olive-oil", name:"Olive Oil", kind:"volume", aliases:["olive oil","extra virgin olive oil","evoo"],
+    coles:{n:"Coles Olive Oil 750ml", q:0.75, u:"L", p:9.50, w:11.00, s:false}, wool:{n:"Woolworths Olive Oil", q:0.75, u:"L", p:10.00, w:11.50}},
+  {id:"soy-sauce", name:"Soy Sauce", kind:"volume", aliases:["soy sauce","soy","tamari"],
+    coles:{n:"Coles Soy Sauce 250ml", q:0.25, u:"L", p:2.20, w:2.50, s:false}, wool:{n:"Woolworths Soy Sauce", q:0.25, u:"L", p:2.40, w:2.60}},
+  {id:"peanut-butter", name:"Peanut Butter", kind:"weight", aliases:["peanut butter","pb"],
+    coles:{n:"Coles Peanut Butter 375g", q:0.375, u:"kg", p:3.00, w:3.40, s:false}, wool:{n:"Woolworths Peanut Butter", q:0.375, u:"kg", p:3.20, w:3.50}},
+  {id:"honey", name:"Honey", kind:"weight", aliases:["honey"],
+    coles:{n:"Coles Honey 375g", q:0.375, u:"kg", p:3.80, w:4.20, s:false}, wool:{n:"Woolworths Honey", q:0.375, u:"kg", p:4.00, w:4.30}},
+  {id:"oats", name:"Rolled Oats", kind:"weight", aliases:["oats","rolled oats","porridge","porridge oats","oatmeal"],
+    coles:{n:"Coles Rolled Oats", q:1, u:"kg", p:1.90, w:2.10, s:false}, wool:{n:"Woolworths Rolled Oats", q:1, u:"kg", p:2.00, w:2.10}},
+  {id:"cereal", name:"Breakfast Cereal", kind:"weight", aliases:["cereal","breakfast cereal","corn flakes","weetbix","weet-bix","muesli"],
+    coles:{n:"Coles Corn Flakes 500g", q:0.5, u:"kg", p:4.00, w:4.50, s:false}, wool:{n:"Woolworths Cereal", q:0.5, u:"kg", p:4.20, w:4.60}},
+  {id:"coffee", name:"Instant Coffee", kind:"weight", aliases:["coffee","instant coffee","ground coffee","coffee beans"],
+    coles:{n:"Coles Instant Coffee 200g", q:0.2, u:"kg", p:8.00, w:9.50, s:false}, wool:{n:"Woolworths Coffee", q:0.2, u:"kg", p:8.50, w:9.50}},
+  {id:"tea", name:"Tea Bags", kind:"count", aliases:["tea","tea bags","black tea","green tea"],
+    coles:{n:"Coles Tea Bags 100pk", q:100, u:"each", p:3.50, w:4.00, s:false}, wool:{n:"Woolworths Tea Bags", q:100, u:"each", p:3.70, w:4.00}},
+  {id:"stock", name:"Stock Cubes", kind:"count", aliases:["stock cubes","stock cube","chicken stock","beef stock","vegetable stock","stock"],
+    coles:{n:"Coles Chicken Stock Cubes 10pk", q:10, u:"each", p:1.50, w:1.80, s:0}, wool:{n:"Woolworths Stock Cubes", q:10, u:"each", p:1.60, w:1.80}},
+  {id:"paprika", name:"Paprika", kind:"weight", aliases:["paprika","smoked paprika","sweet paprika"],
+    coles:{n:"Coles Paprika 45g", q:0.045, u:"kg", p:1.50, w:1.80, s:false}, wool:{n:"Woolworths Paprika", q:0.045, u:"kg", p:1.60, w:1.80}},
+  {id:"cumin", name:"Ground Cumin", kind:"weight", aliases:["cumin","ground cumin","cumin powder"],
+    coles:{n:"Coles Ground Cumin 50g", q:0.05, u:"kg", p:1.70, w:2.00, s:false}, wool:{n:"Woolworths Cumin", q:0.05, u:"kg", p:1.80, w:2.00}},
+  {id:"garlic-powder", name:"Garlic Powder", kind:"weight", aliases:["garlic powder"],
+    coles:{n:"Coles Garlic Powder 60g", q:0.06, u:"kg", p:1.80, w:2.10, s:false}, wool:{n:"Woolworths Garlic Powder", q:0.06, u:"kg", p:1.90, w:2.10}},
+  {id:"salt", name:"Salt", kind:"weight", aliases:["salt","sea salt","table salt"],
+    coles:{n:"Coles Salt 500g", q:0.5, u:"kg", p:1.20, w:1.40, s:false}, wool:{n:"Woolworths Salt", q:0.5, u:"kg", p:1.30, w:1.40}},
+  {id:"pepper", name:"Black Pepper", kind:"weight", aliases:["pepper","black pepper","cracked pepper","ground pepper"],
+    coles:{n:"Coles Black Pepper 50g", q:0.05, u:"kg", p:1.60, w:1.90, s:false}, wool:{n:"Woolworths Pepper", q:0.05, u:"kg", p:1.70, w:1.90}},
+  {id:"corn", name:"Corn Kernels", kind:"weight", aliases:["corn","corn kernels","canned corn","tinned corn","sweetcorn"],
+    coles:{n:"Coles Corn Kernels 400g", q:0.4, u:"kg", p:1.10, w:1.30, s:false}, wool:{n:"Woolworths Corn Kernels", q:0.4, u:"kg", p:1.20, w:1.30}},
+  {id:"bread", name:"White Bread", kind:"weight", aliases:["bread","white bread","sandwich bread","wholemeal bread","toast bread"],
+    coles:{n:"Coles White Sandwich Bread", q:0.65, u:"kg", p:2.30, w:2.60, s:false}, wool:{n:"Woolworths White Bread", q:0.65, u:"kg", p:2.50, w:2.70}},
+  {id:"wraps", name:"Wraps", kind:"count", aliases:["wraps","tortilla","tortillas","flatbread"],
+    coles:{n:"Coles Wraps 8pk", q:8, u:"each", p:2.50, w:2.90, s:false}, wool:{n:"Woolworths Wraps", q:8, u:"each", p:2.80, w:3.00}},
+  {id:"almonds", name:"Almonds", kind:"weight", aliases:["almonds","almond","raw almonds"],
+    coles:{n:"Coles Raw Almonds 750g", q:0.75, u:"kg", p:8.00, w:9.00, s:false}, wool:{n:"Woolworths Almonds", q:0.75, u:"kg", p:8.50, w:9.50}},
+
+  // --- Frozen ---
+  {id:"frozen-peas", name:"Frozen Peas", kind:"weight", aliases:["frozen peas","peas"],
+    coles:{n:"Coles Frozen Peas 1kg", q:1, u:"kg", p:2.50, w:2.80, s:false}, wool:{n:"Woolworths Frozen Peas", q:1, u:"kg", p:2.70, w:2.90}},
+  {id:"frozen-veg", name:"Mixed Frozen Vegetables", kind:"weight", aliases:["frozen vegetables","mixed vegetables","frozen veg","mixed frozen veg","frozen mixed vegetables"],
+    coles:{n:"Coles Mixed Vegetables 1kg", q:1, u:"kg", p:3.00, w:3.40, s:false}, wool:{n:"Woolworths Frozen Veg", q:1, u:"kg", p:3.20, w:3.50}},
+  {id:"frozen-berries", name:"Frozen Mixed Berries", kind:"weight", aliases:["frozen berries","mixed berries","berries","blueberries","frozen blueberries"],
+    coles:{n:"Coles Frozen Mixed Berries 500g", q:0.5, u:"kg", p:5.00, w:5.80, s:false}, wool:{n:"Woolworths Frozen Berries", q:0.5, u:"kg", p:5.50, w:6.00}},
+  {id:"frozen-chips", name:"Frozen Chips", kind:"weight", aliases:["chips","frozen chips","hot chips","fries"],
+    coles:{n:"Coles Frozen Chips 900g", q:0.9, u:"kg", p:3.80, w:4.30, s:false}, wool:{n:"Woolworths Frozen Chips", q:0.9, u:"kg", p:4.00, w:4.40}},
+
+  // --- Drinks ---
+  {id:"almond-milk", name:"Almond Milk", kind:"volume", aliases:["almond milk","oat milk","soy milk","plant milk"],
+    coles:{n:"Coles Almond Milk 1L", q:1, u:"L", p:1.90, w:2.20, s:false}, wool:{n:"Woolworths Almond Milk", q:1, u:"L", p:2.10, w:2.30}},
+  {id:"orange-juice", name:"Orange Juice", kind:"volume", aliases:["orange juice","juice","oj"],
+    coles:{n:"Coles Orange Juice 2L", q:2, u:"L", p:4.00, w:4.40, s:false}, wool:{n:"Woolworths Orange Juice", q:2, u:"L", p:4.20, w:4.50}}
+];
+const CAT_BY_ID = {};
+CAT.forEach(c => CAT_BY_ID[c.id] = c);
+
+/* Aldi weekly Special Buys (specials-only store). price per pack q (in u). */
+const ALDI_SPECIALS = [
+  {id:"eggs", price:3.99, q:12, u:"each", note:"Special Buy", until:"2026-08-19"},
+  {id:"milk", price:2.79, q:2, u:"L", note:"Special Buy", until:"2026-08-19"},
+  {id:"butter", price:2.49, q:0.25, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"cheddar", price:4.99, q:0.5, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"coffee", price:6.99, q:0.2, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"olive-oil", price:8.99, q:0.75, u:"L", note:"Special Buy", until:"2026-08-19"},
+  {id:"frozen-berries", price:4.49, q:0.5, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"pasta", price:0.99, q:0.5, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"tomato", price:2.99, q:1, u:"kg", note:"Special Buy", until:"2026-08-19"},
+  {id:"banana", price:1.99, q:1, u:"kg", note:"Special Buy", until:"2026-08-19"}
+];
+
+/* ---------------- price feed (optional live refresh) ---------------- */
+let FEED_META = { generatedAt: null, status: null, source: "seed" };
+function applyFeed(feed){
+  try{
+    if(!feed || feed.status !== "ok") return;
+    FEED_META.generatedAt = feed.generatedAt || null;
+    FEED_META.status = feed.status;
+    FEED_META.source = "feed";
+    const st = feed.stores || {};
+    if(st.coles && Array.isArray(st.coles.items)){
+      st.coles.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.coles){ c.coles.p = it.price ?? c.coles.p; c.coles.w = it.wasPrice ?? c.coles.w; c.coles.s = !!it.onSpecial; c.coles.promo = it.promo || c.coles.promo; } });
+    }
+    if(st.woolworths && Array.isArray(st.woolworths.items)){
+      st.woolworths.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.wool){ c.wool.p = it.price ?? c.wool.p; c.wool.w = it.wasPrice ?? c.wool.w; c.wool.s = !!it.onSpecial; } });
+    }
+    if(st.aldi && Array.isArray(st.aldi.specials)){
+      CAT.forEach(c => c.aldiSpecial = null);
+      st.aldi.specials.forEach(sp => { const c = CAT_BY_ID[sp.id]; if(c) c.aldiSpecial = { price: sp.price, q: sp.q, u: sp.u, note: sp.note || "Special Buy", until: sp.until || null }; });
+    }
+  }catch(e){ /* ignore malformed feed */ }
+}
+function seedAldi(){ ALDI_SPECIALS.forEach(sp => { const c = CAT_BY_ID[sp.id]; if(c) c.aldiSpecial = { price: sp.price, q: sp.q, u: sp.u, note: sp.note, until: sp.until }; }); }
+
+/* ---------------- state ---------------- */
+const DEFAULT_SETTINGS = { stores:{coles:true, woolworths:true, aldi:true}, splitPref:0.75, minSaving:2.00, maxStores:3, theme:"auto" };
+function loadState(){
+  let recipes=[], plan={period:7, days:[]}, settings=Object.assign({}, DEFAULT_SETTINGS, {stores:{coles:true,woolworths:true,aldi:true}}), checked={};
+  try{
+    if(LS){
+      if(LS.getItem("sa_recipes")) recipes = JSON.parse(LS.getItem("sa_recipes")) || [];
+      if(LS.getItem("sa_plan")) plan = JSON.parse(LS.getItem("sa_plan")) || {period:7, days:[]};
+      if(LS.getItem("sa_settings")){ const s = JSON.parse(LS.getItem("sa_settings")); settings = Object.assign({}, DEFAULT_SETTINGS, s, {stores:Object.assign({coles:true,woolworths:true,aldi:true}, s.stores||{})}); }
+      if(LS.getItem("sa_checked")) checked = JSON.parse(LS.getItem("sa_checked")) || {};
+    }
+  }catch(e){}
+  if(!Array.isArray(plan.days)) plan.days = [];
+  return {recipes, plan, settings, checked};
+}
+let STATE = loadState();
+function saveRecipes(){ if(LS) LS.setItem("sa_recipes", JSON.stringify(STATE.recipes)); }
+function savePlan(){ if(LS) LS.setItem("sa_plan", JSON.stringify(STATE.plan)); }
+function saveSettings(){ if(LS) LS.setItem("sa_settings", JSON.stringify(STATE.settings)); }
+function saveChecked(){ if(LS) LS.setItem("sa_checked", JSON.stringify(STATE.checked)); }
+
+/* ---------------- unit conversion ---------------- */
+const UNIT_WEIGHT = {g:1, gram:1, grams:1, kg:1000, kilos:1000};
+const UNIT_VOLUME = {ml:1, mls:1, l:1000, litre:1000, liter:1000, litres:1000, liters:1000, cup:250, cups:250, tbsp:20, tbs:20, tablespoon:20, tsp:5, teaspoon:5};
+const UNIT_COUNT = {each:1, ea:1, x:1, head:1, bunch:1, can:1, tin:1, pack:1, packet:1, pk:1, cloves:1, clove:1, slices:1, slice:1, serve:1, serves:1};
+function classifyUnit(u){
+  u = (u||"").toLowerCase();
+  if(UNIT_WEIGHT[u]!==undefined) return "weight";
+  if(UNIT_VOLUME[u]!==undefined) return "volume";
+  return "count";
+}
+function toBase(qty, unit){
+  unit = (unit||"").toLowerCase();
+  if(UNIT_WEIGHT[unit]!==undefined) return {kind:"weight", amount: qty*UNIT_WEIGHT[unit]};      // grams
+  if(UNIT_VOLUME[unit]!==undefined) return {kind:"volume", amount: qty*UNIT_VOLUME[unit]};      // mL
+  if(UNIT_COUNT[unit]!==undefined) return {kind:"count", amount: qty*UNIT_COUNT[unit]};         // each
+  return {kind:"count", amount: qty};
+}
+
+/* Conversions so "2 cups rice" (volume) prices correctly against kg, and
+   "1 onion" (count) prices correctly against per-kg produce. */
+const EACH_G = {  // typical grams per "each" for produce & tinned goods
+  onion:150, tomato:120, potato:180, carrot:70, "sweet-potato":300, avocado:250,
+  lemon:110, lime:70, apple:170, banana:120, orange:200, ginger:25, mushrooms:250,
+  "tinned-tomatoes":400, chickpeas:400, "black-beans":400, "baked-beans":420,
+  corn:400, tuna:95, "tomato-paste":140, lentils:400, butter:250
+};
+const DENS_GML = {  // grams per mL for common volume→weight conversions
+  rice:0.85, oats:0.36, flour:0.60, sugar:0.88, butter:0.96, "olive-oil":0.90,
+  honey:1.40, lentils:0.80, chickpeas:0.80, "black-beans":0.80, salt:1.20,
+  cumin:0.50, paprika:0.50, "garlic-powder":0.50, pepper:0.50, coffee:0.35,
+  "peanut-butter":1.30, almonds:0.55, yoghurt:1.03, cream:1.00, milk:1.03,
+  "almond-milk":1.00, "orange-juice":1.05, "soy-sauce":1.20, mushrooms:0.40,
+  "frozen-berries":0.70, "frozen-peas":0.70, "frozen-veg":0.70, "pasta-sauce":1.05,
+  "tomato-paste":1.20
+};
+function convertToKind(amount, fromKind, toKind, id){
+  if(fromKind === toKind) return amount;
+  if(fromKind === "count" && toKind === "weight"){
+    const g = EACH_G[id]; if(g) return amount * g;
+  }
+  if(fromKind === "volume" && toKind === "weight"){
+    const d = DENS_GML[id] || 1; return amount * d;
+  }
+  if(fromKind === "weight" && toKind === "volume"){
+    const d = DENS_GML[id] || 1; return amount / d;
+  }
+  if((fromKind === "weight" || fromKind === "volume") && toKind === "count"){
+    const g = EACH_G[id]; if(g) return amount / g;
+  }
+  return amount; // best effort
+}
+
+/* ---------------- free-text parser ---------------- */
+const STOPWORDS = new Set(["of","fresh","frozen","raw","cooked","sliced","diced","chopped","minced","whole","large","small","medium","approx","about","some","a","an","the","and","with","plus","optional","to","taste"]);
+function normalizeName(s){
+  return s.toLowerCase().replace(/[^a-z0-9\s-]/g," ").replace(/\s+/g," ").trim();
+}
+function matchCanonical(nameRaw){
+  const n = normalizeName(nameRaw);
+  if(!n) return null;
+  const tokens = n.split(" ").filter(t => t && !STOPWORDS.has(t));
+  let best=null, bestScore=0;
+  for(const c of CAT){
+    for(const a of c.aliases){
+      const an = normalizeName(a);
+      if(an === n) return c.id;
+      if(n.includes(an) && an.length >= 3){ const sc = an.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
+      else if(an.includes(n) && n.length >= 4){ const sc = n.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
+    }
+  }
+  if(best) return best;
+  // token overlap fallback
+  let bestTok=null, bestOverlap=0;
+  for(const c of CAT){
+    for(const a of c.aliases){
+      const at = normalizeName(a).split(" ").filter(t=>t&&!STOPWORDS.has(t));
+      const overlap = tokens.filter(t => at.includes(t)).length;
+      if(overlap > bestOverlap){ bestOverlap = overlap; bestTok = c.id; }
+    }
+  }
+  return (bestOverlap >= 1 && tokens.length <= 2) ? bestTok : (bestTok && bestOverlap >= 2 ? bestTok : null);
+}
+function parseLine(line){
+  line = (line||"").trim();
+  if(!line) return null;
+  let qty=1, unit=null, name=line, outerQty=null;
+  // "2 x 400g chicken" style
+  const xm = line.match(/^(\d+(?:\.\d+)?)\s*x\s+(.+)$/i);
+  if(xm){ outerQty = parseFloat(xm[1]); line = xm[2]; }
+  const m = line.match(/^(\d+(?:\.\d+)?)\s*(kg|kilos?|g|grams?|ml|mls|l|litres?|liters?|cups?|tbsp|tablespoons?|tsp|teaspoons?|x|each|head|bunch|can|tin|pack|packet|cloves?|slices?)\s*(?:of\s+)?(.+)$/i);
+  if(m){
+    qty = parseFloat(m[1]);
+    unit = m[2].toLowerCase();
+    name = m[3].trim();
+    if(/^cups?$/.test(unit)) unit = "cup";
+    if(/^tbsp|tablespoons?$/.test(unit)) unit = "tbsp";
+    if(/^tsp|teaspoons?$/.test(unit)) unit = "tsp";
+    if(/^cloves?$/.test(unit)) unit = "clove";
+    if(/^slices?$/.test(unit)) unit = "slice";
+  } else {
+    // no unit token — "1 broccoli head", "2 chicken breasts", "3 onions"
+    const m2 = line.match(/^(\d+(?:\.\d+)?)\s+([a-z].*)$/i);
+    if(m2){ qty = parseFloat(m2[1]); name = m2[2].trim(); }
+  }
+  if(outerQty !== null) qty = qty * outerQty;
+  const canonicalId = matchCanonical(name);
+  return { raw: line, qty: qtyNum(qty), unit: unit, name: name, canonicalId: canonicalId };
+}
+function parseFreeText(text){
+  const out = [];
+  (text||"").split(/[\n,;]+/).forEach(line => {
+    const r = parseLine(line);
+    if(r) out.push(r);
+  });
+  return out;
+}
+
+/* ---------------- aggregation ---------------- */
+function aggregatePlan(plan, recipes){
+  const totals = {};   // canonicalId -> {amount, kind}
+  const customs = {};  // normalized name -> {amount, kind, name}
+  (plan.days||[]).forEach(day => {
+    (day.recipeIds||[]).forEach(rid => {
+      const r = recipes.find(x => x.id === rid);
+      if(!r) return;
+      const serves = day.servings && day.servings[rid] ? day.servings[rid] : (r.baseServings || 1);
+      const factor = serves / (r.baseServings || 1);
+      (r.ingredients||[]).forEach(ing => {
+        const raw = toBase((ing.qty||0)*factor, ing.unit);
+        if(ing.canonicalId && CAT_BY_ID[ing.canonicalId]){
+          const cat = CAT_BY_ID[ing.canonicalId];
+          const base = { kind: cat.kind, amount: convertToKind(raw.amount, raw.kind, cat.kind, ing.canonicalId) };
+          const t = totals[ing.canonicalId] || {amount:0, kind:base.kind};
+          t.amount += base.amount; t.kind = base.kind; totals[ing.canonicalId] = t;
+        }else{
+          const key = normalizeName(ing.name);
+          if(!key) return;
+          const c = customs[key] || {amount:0, kind:raw.kind, name: ing.name};
+          c.amount += raw.amount; customs[key] = c;
+        }
+      });
+    });
+  });
+  return {totals, customs};
+}
+
+/* ---------------- costing ---------------- */
+function needInProductUnit(amount, kind){
+  if(kind === "weight") return amount/1000;   // kg
+  if(kind === "volume") return amount/1000;   // L
+  return amount;                              // each
+}
+function computeCost(prod, amount, kind){
+  // prod: {q, u, p, l?}  q=pack size in u, p=price
+  const need = needInProductUnit(amount, kind);
+  const unitPrice = prod.p / prod.q;
+  if(prod.l){
+    return { cost: unitPrice*need, packs: qtyNum(need), unitPrice: unitPrice, need: qtyNum(need) };
+  }
+  const packs = Math.max(1, Math.ceil(need / prod.q - 1e-9));
+  return { cost: packs*prod.p, packs: packs, unitPrice: unitPrice, need: qtyNum(need) };
+}
+function unitSymbol(kind){ return kind==="weight" ? "kg" : kind==="volume" ? "L" : "each"; }
+
+/* ---------------- routing engine ---------------- */
+function buildShoppingList(){
+  const {totals, customs} = aggregatePlan(STATE.plan, STATE.recipes);
+  const st = STATE.settings.stores;
+  const fullLine = ["coles","woolworths"].filter(s => st[s]);
+  const entries = [];
+  Object.keys(totals).forEach(id => {
+    const cat = CAT_BY_ID[id];
+    const {amount, kind} = totals[id];
+    const options = [];
+    ["coles","woolworths"].forEach(s => {
+      const p = s === "coles" ? cat.coles : cat.wool;
+      if(!p || !st[s]) return;
+      const c = computeCost(p, amount, kind);
+      options.push({ store:s, cost:c.cost, unitPrice:c.unitPrice, packs:c.packs, need:c.need, prod:p, special: !!p.s, wasPrice: p.w, promo: p.promo });
+    });
+    if(st.aldi && cat.aldiSpecial){
+      const sp = cat.aldiSpecial;
+      const prod = {q: sp.q, u: sp.u, p: sp.price, l:false};
+      const c = computeCost(prod, amount, kind);
+      options.push({ store:"aldi", cost:c.cost, unitPrice:c.unitPrice, packs:c.packs, need:c.need, prod:{n:"ALDI " + cat.name, q: sp.q, u: sp.u, p: sp.price, s:true, promo: sp.note, until: sp.until}, special:true, aldi:true });
+    }
+    entries.push({ id, cat, amount, kind, options });
+  });
+
+  // base store: full-line store with the lowest total cost
+  let base = fullLine[0];
+  let baseTotal = Infinity, baseCover = -1;
+  fullLine.forEach(s => {
+    let tot = 0, cover = 0;
+    entries.forEach(e => {
+      const o = e.options.find(x => x.store === s);
+      if(o){ tot += o.cost; cover++; } else tot += Infinity;
+    });
+    if(cover > baseCover || (cover === baseCover && tot < baseTotal)){ base = s; baseCover = cover; baseTotal = tot; }
+  });
+
+  // assign initial + threshold moves
+  const used = new Set();
+  if(base) used.add(base);
+  const chosen = {}; // id -> option
+  entries.forEach(e => {
+    const o = e.options.find(x => x.store === base) || (e.options[0] || null);
+    if(o) chosen[e.id] = { option:o, fromBase:true, baseStore: base };
+  });
+
+  const s = STATE.settings.splitPref;
+  let threshold = Infinity;
+  if(s >= 1) threshold = 0;
+  else if(s > 0) threshold = STATE.settings.minSaving * (1/s - 1);
+
+  // candidates: biggest savings first
+  const candidates = entries.map(e => {
+    const cur = chosen[e.id]; if(!cur) return null;
+    const curCost = cur.option.cost;
+    let bestAlt = null, bestSaving = 0;
+    e.options.forEach(o => {
+      if(o.store === cur.option.store) return;
+      const saving = curCost - o.cost;
+      if(saving > bestSaving){ bestSaving = saving; bestAlt = o; }
+    });
+    return { e, cur, alt:bestAlt, saving:bestSaving };
+  }).filter(x => x && x.alt && x.saving > 0).sort((a,b) => b.saving - a.saving);
+
+  candidates.forEach(c => {
+    const saving = c.saving;
+    if(saving <= threshold) return;
+    if(used.size >= STATE.settings.maxStores && !used.has(c.alt.store)) return;
+    chosen[c.e.id] = { option:c.alt, fromBase: c.alt.store !== c.cur.option.store, baseStore: c.cur.option.store };
+    used.add(c.alt.store);
+  });
+
+  // group by store
+  const order = ["coles","woolworths","aldi"];
+  const byStore = {};
+  order.forEach(s => byStore[s] = []);
+  const manual = [];
+  entries.forEach(e => {
+    const ch = chosen[e.id];
+    if(!ch){ return; }
+    byStore[ch.option.store].push({ id:e.id, cat:e.cat, amount:e.amount, kind:e.kind, option:ch.option, baseStore:ch.baseStore, moved: ch.option.store !== ch.baseStore });
+  });
+  Object.keys(customs).forEach(k => manual.push({ name: customs[k].name, amount: customs[k].amount, kind: customs[k].kind }));
+
+  // totals
+  let total = 0, baseOnly = 0;
+  entries.forEach(e => { if(chosen[e.id]) total += chosen[e.id].option.cost; });
+  if(base){
+    entries.forEach(e => {
+      const o = e.options.find(x => x.store === base);
+      if(o) baseOnly += o.cost; else { const any = chosen[e.id]; if(any) baseOnly += any.option.cost; }
+    });
+  }
+  const chosenMap = {};
+  entries.forEach(e => { if(chosen[e.id]) chosenMap[e.id] = chosen[e.id].option; });
+  return { byStore, manual, total, baseOnly, savings: baseOnly - total, usedStores: Array.from(used), entries, totals, customs, chosen: chosenMap };
+}
+
+/* ---------------- formatting ---------------- */
+function fmtQty(amount, kind){
+  if(kind === "weight"){
+    if(amount >= 1000){ const kg = Math.round(amount/100)/10; return kg + " kg"; }
+    return Math.max(5, Math.round(amount/5)*5) + " g";
+  }
+  if(kind === "volume"){
+    if(amount >= 1000){ const l = Math.round(amount/100)/10; return l + " L"; }
+    return Math.round(amount/5)*5 + " mL";
+  }
+  return (Math.round(amount*100)/100) + (amount === 1 ? " each" : " each");
+}
+function fmtPack(opt, amount, kind){
+  if(opt.prod && opt.prod.l) return "≈ " + fmtQty(amount, kind);
+  const p = opt.prod;
+  let qtyLabel;
+  if(p.u === "kg") qtyLabel = Math.round(p.q*1000) + "g";
+  else if(p.u === "L") qtyLabel = (p.q < 1 ? Math.round(p.q*1000) + "mL" : p.q + "L");
+  else qtyLabel = p.q + (p.q > 1 ? " pack" : " each");
+  return opt.packs + " × " + qtyLabel;
+}
+
+/* ============================================================
+   UI (browser only)
+   ============================================================ */
+const UI = (typeof document !== "undefined" && document.getElementById) ? (function(){
+
+  const STORE_META = {
+    coles: { label:"Coles", color:"var(--coles)", hex:"#e3001b" },
+    woolworths:{ label:"Woolworths", color:"var(--wool)", hex:"#007a46" },
+    aldi: { label:"Aldi", color:"var(--aldi)", hex:"#0f3a8c" }
+  };
+  let activeTab = "home";
+  let pasteItems = [];
+  let editingRecipeId = null;
+
+  function toast(msg){
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function planId(){ return hashStr(JSON.stringify(STATE.plan) + ":" + STATE.plan.period); }
+  function checkedKey(store, id, amount, kind){ return planId() + ":" + store + ":" + id + ":" + Math.round(amount*10) + ":" + kind; }
+  function isChecked(store, id, amount, kind){ return !!STATE.checked[checkedKey(store, id, amount, kind)]; }
+
+  /* ---------- theme ---------- */
+  function applyTheme(){
+    const t = STATE.settings.theme || "auto";
+    const dark = t === "dark" || (t === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    document.querySelectorAll("#themeSeg button").forEach(b => b.classList.toggle("on", b.dataset.themeVal === t));
+  }
+
+  /* ---------- tab switching ---------- */
+  function showTab(tab){
+    activeTab = tab;
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("on"));
+    $("screen-" + tab).classList.add("on");
+    document.querySelectorAll("#tabbar button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+    if(tab === "home") renderHome();
+    if(tab === "plan") renderPlan();
+    if(tab === "recipes") renderRecipes();
+    if(tab === "specials") renderSpecials();
+    if(tab === "more") renderMore();
+    try { window.scrollTo(0, 0); } catch(e) {}
+  }
+
+  /* ---------- HOME ---------- */
+  function renderHome(){
+    const el = $("homeContent");
+    const hasRecipes = STATE.recipes.length > 0;
+    const hasPlan = (STATE.plan.days || []).some(d => (d.recipeIds||[]).length > 0);
+
+    if(!hasRecipes){
+      el.innerHTML = `
+        <div class="card empty">
+          <div class="fx">🛒</div>
+          <b>Plan → Shop → Save</b>
+          <p class="muted" style="max-width:320px;margin:8px auto 18px">Enter your meal prep once. Get a price-optimised list split across Coles, Woolworths and Aldi.</p>
+          <div style="text-align:left;max-width:340px;margin:0 auto 18px">
+            <div class="onboard-step"><span class="n">1</span><div><b>Add a recipe</b><div class="muted">Paste ingredients or use the builder.</div></div></div>
+            <div class="onboard-step"><span class="n">2</span><div><b>Plan your week</b><div class="muted">Assign meals to days.</div></div></div>
+            <div class="onboard-step"><span class="n">3</span><div><b>See your list</b><div class="muted">Auto-split to the cheapest stores.</div></div></div>
+          </div>
+          <button class="btn primary" data-action="goto-recipes">Add your first recipe</button>
+        </div>`;
+      return;
+    }
+    if(!hasPlan){
+      el.innerHTML = `
+        <div class="card empty">
+          <div class="fx">📅</div>
+          <b>Recipes ready — now plan the week</b>
+          <p class="muted" style="margin:8px 0 18px">You have ${STATE.recipes.length} recipe${STATE.recipes.length>1?"s":""}. Assign them to days and your list will appear here.</p>
+          <button class="btn primary" data-action="goto-plan">Open planner</button>
+        </div>`;
+      return;
+    }
+
+    const list = buildShoppingList();
+    const checkedCount = countChecked(list);
+    const totalCount = countItems(list);
+
+    let html = "";
+
+    // summary card
+    const chips = list.usedStores.filter(s => STORE_META[s] && byStoreCount(list,s) > 0).map(s => `
+      <span class="chip"><span class="sw" style="background:${STORE_META[s].hex}"></span>${STORE_META[s].label}
+      <span class="sub">${byStoreCount(list,s)} · ${fmtAUD(byStoreTotal(list,s))}</span></span>`).join("");
+    const saveNote = list.savings > 0.005 ? `<div class="save">you save ${fmtAUD(list.savings)} by splitting</div>` : "";
+    html += `
+      <div class="card">
+        <div class="summary-total"><span class="big">${fmtAUD(list.total)}</span>${saveNote}</div>
+        <div class="store-chips">${chips || '<span class="muted">no stores selected</span>'}</div>
+        <div class="progress"><i id="progressBar"></i></div>
+        <div class="kv" style="padding:2px 0 0"><span class="muted">${checkedCount} of ${totalCount} items</span>
+        <span class="muted">${(STATE.plan.period)}-day prep</span></div>
+      </div>`;
+
+    // specials strip
+    const specialCount = list.entries.filter(e => { const o = list.chosen[e.id]; return o && (o.special || (o.wasPrice && o.wasPrice > o.prod.p)); }).length;
+    if(specialCount > 0){
+      html += `<div class="special-strip" data-action="goto-specials">
+        <span class="fx">🔥</span>
+        <div><b>${specialCount} item${specialCount>1?"s":""} on special this week</b><br>
+        <span>Tap to see Aldi Special Buys & matching deals</span></div>
+      </div>`;
+    }
+
+    // grouped list
+    ["coles","woolworths","aldi"].forEach(s => {
+      const items = (list.byStore[s]||[]).filter(it => it);
+      if(items.length === 0) return;
+      const done = items.filter(it => isChecked(s, it.id, it.amount, it.kind)).length;
+      html += `<div class="store-group">
+        <div class="store-head">
+          <span class="sw" style="background:${STORE_META[s].hex}"></span>
+          <span class="nm">${STORE_META[s].label}</span>
+          <span class="ct">${done}/${items.length}</span>
+          <span class="st">${fmtAUD(items.reduce((a,it)=>a+it.option.cost,0))}</span>
+        </div>
+        <div class="rows">${items.map(it => renderRow(s, it, list)).join("")}</div>
+      </div>`;
+    });
+
+    if(list.manual.length > 0){
+      html += `<div class="store-group">
+        <div class="store-head"><span class="sw" style="background:#9aa7a0"></span><span class="nm">Manual items</span><span class="ct">no price yet</span></div>
+        <div class="rows">${list.manual.map(m => `
+          <div class="row">
+            <div class="main"><div class="nm">${esc(m.name)}</div><div class="sub">${fmtQty(m.amount, m.kind)}</div>
+            <span class="badge manual">add manually</span></div>
+          </div>`).join("")}</div>
+      </div>`;
+    }
+
+    html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+      <span class="muted">Want a different split?</span>
+      <button class="btn sm soft" data-action="goto-more">Adjust threshold</button>
+    </div>`;
+
+    el.innerHTML = html;
+    const bar = $("progressBar");
+    if(bar && totalCount > 0) bar.style.width = Math.round(checkedCount/totalCount*100) + "%";
+  }
+
+  function renderRow(store, it, list){
+    const checked = isChecked(store, it.id, it.amount, it.kind);
+    const o = it.option;
+    const onSpecial = o.special || (o.wasPrice && o.wasPrice > o.prod.p);
+    let badges = "";
+    if(onSpecial) badges += `<span class="badge special">${o.promo || "Special"}</span>`;
+    if(store === "aldi") badges += `<span class="badge aldi">Aldi Special Buy</span>`;
+    let why = "";
+    if(it.moved && it.baseStore && STORE_META[it.baseStore]){
+      const saving = baseCostFor(it, list) - o.cost;
+      if(saving > 0.005) why = `<div class="why">Save ${fmtAUD(saving)} vs ${STORE_META[it.baseStore].label}</div>`;
+    }
+    return `<div class="row ${checked?"checked":""}" data-action="toggle" data-store="${store}" data-id="${it.id}" data-amount="${Math.round(it.amount*10)}" data-kind="${it.kind}">
+      <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+      <div class="main">
+        <div class="nm">${esc(it.cat.name)}</div>
+        <div class="sub">${fmtQty(it.amount, it.kind)} · ${esc(o.prod.n||"")} · ${fmtPack(o, it.amount, it.kind)}</div>
+        ${badges}${why}
+      </div>
+      <div class="right">
+        <div class="price">${fmtAUD(o.cost)}</div>
+        <div class="unit">${fmtAUD2(o.unitPrice)}/${unitSymbol(it.kind)}</div>
+      </div>
+    </div>`;
+  }
+  function baseCostFor(it, list){
+    const e = list.entries.find(x => x.id === it.id);
+    if(!e || !it.baseStore) return it.option.cost;
+    const o = e.options.find(x => x.store === it.baseStore);
+    return o ? o.cost : it.option.cost;
+  }
+  function chosenOpt(list, id){ return list.chosen[id] || null; }
+  function countItems(list){
+    let n = 0;
+    ["coles","woolworths","aldi"].forEach(s => n += (list.byStore[s]||[]).filter(Boolean).length);
+    return n + list.manual.length;
+  }
+  function countChecked(list){
+    let n = 0;
+    ["coles","woolworths","aldi"].forEach(s => (list.byStore[s]||[]).forEach(it => { if(isChecked(s, it.id, it.amount, it.kind)) n++; }));
+    return n;
+  }
+  function byStoreCount(list, s){ return (list.byStore[s]||[]).filter(Boolean).length; }
+  function byStoreTotal(list, s){ return (list.byStore[s]||[]).reduce((a,it)=>a+it.option.cost,0); }
+
+  /* ---------- PLAN ---------- */
+  function renderPlan(){
+    const period = STATE.plan.period || 7;
+    document.querySelectorAll("#periodSeg button").forEach(b => b.classList.toggle("on", parseInt(b.dataset.period,10) === period));
+    $("periodHint").textContent = period === 7 ? "Planning for one week (7 days)." : "Planning for a fortnight (14 days).";
+    ensureDays();
+    const days = STATE.plan.days;
+    let html = "";
+    days.forEach((d, i) => {
+      const chips = (d.recipeIds||[]).map(rid => {
+        const r = STATE.recipes.find(x => x.id === rid);
+        if(!r) return "";
+        const serves = (d.servings && d.servings[rid]) || r.baseServings || 1;
+        return `<span class="mealchip">${esc(r.name)} <span class="srv">×${serves}</span>
+          <button class="rm" data-action="remove-meal" data-day="${i}" data-rid="${rid}">✕</button></span>`;
+      }).join("");
+      html += `<div class="dayrow">
+        <div class="dt"><b>Day ${i+1}</b><span class="muted" style="font-size:12px">${dayName(i)}</span>
+        <button class="add" data-action="pick-recipe" data-day="${i}">+ Add meal</button></div>
+        <div>${chips || '<span class="muted" style="font-size:12.5px">No meals yet</span>'}</div>
+      </div>`;
+    });
+    $("planDays").innerHTML = html;
+
+    const {totals, customs} = aggregatePlan(STATE.plan, STATE.recipes);
+    const meals = days.reduce((a,d) => a + (d.recipeIds||[]).length, 0);
+    if(meals > 0){
+      $("planTotals").style.display = "block";
+      $("ptMeals").textContent = meals;
+      $("ptIngs").textContent = Object.keys(totals).length + Object.keys(customs).length;
+      const list = buildShoppingList();
+      $("ptCost").textContent = fmtAUD(list.total);
+    }else{
+      $("planTotals").style.display = "none";
+    }
+  }
+  function dayName(i){ return ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][i%7]; }
+  function ensureDays(){
+    const period = STATE.plan.period || 7;
+    if(!STATE.plan.days) STATE.plan.days = [];
+    while(STATE.plan.days.length < period) STATE.plan.days.push({recipeIds:[], servings:{}});
+    if(STATE.plan.days.length > period) STATE.plan.days = STATE.plan.days.slice(0, period);
+  }
+
+  /* ---------- RECIPES ---------- */
+  function renderRecipes(){
+    if(STATE.recipes.length === 0){
+      $("recipeList").innerHTML = `<div class="empty" style="padding:16px 6px"><span class="fx">🍳</span><b>No recipes yet</b><p class="muted">Paste one above, or tap + New.</p></div>`;
+    }else{
+      $("recipeList").innerHTML = STATE.recipes.map(r => `
+        <div class="recipe" data-action="edit-recipe" data-id="${r.id}">
+          <div class="av">🍽️</div>
+          <div class="main"><div class="nm">${esc(r.name)}</div>
+          <div class="sub">${(r.ingredients||[]).length} ingredients · serves ${r.baseServings||1}</div></div>
+          <div class="ch">›</div>
+        </div>`).join("");
+    }
+    $("parseBtn").disabled = !$("pasteBox").value.trim();
+  }
+
+  function renderParsePreview(){
+    const el = $("parsePreview");
+    if(pasteItems.length === 0){ el.innerHTML = ""; $("saveParsedBtn").disabled = true; return; }
+    $("saveParsedBtn").disabled = false;
+    el.innerHTML = `<div class="hr"></div><h2 style="font-size:13px;margin:0 0 8px">Preview — ${pasteItems.length} ingredient${pasteItems.length>1?"s":""}</h2>` +
+      pasteItems.map(it => {
+        const matched = it.canonicalId && CAT_BY_ID[it.canonicalId];
+        return `<div class="kv"><span>${esc(it.name)}</span><span style="display:flex;align-items:center;gap:8px">
+          <span class="muted">${it.qty} ${it.unit||""}</span>
+          ${matched ? '<span class="badge move">✓ matched</span>' : '<span class="badge manual">manual</span>'}
+        </span></div>`;
+      }).join("");
+  }
+
+  function openRecipeEditor(recipe){
+    editingRecipeId = recipe ? recipe.id : null;
+    const r = recipe || { name:"", baseServings:4, ingredients:[] };
+    const catNames = CAT.map(c => c.name).join('","');
+    let ingRows = r.ingredients.map(ing => ingRowHtml(ing.qty, ing.unit, ing.name)).join("");
+    if(!ingRows) ingRows = ingRowHtml(1,"","");
+    $("sheet").innerHTML = `
+      <h3>${recipe ? "Edit recipe" : "New recipe"}</h3>
+      <label class="f">Recipe name</label>
+      <input type="text" id="recName" value="${esc(r.name)}" placeholder="e.g. Chicken stir fry">
+      <label class="f">Serves</label>
+      <input type="number" id="recServes" value="${r.baseServings||4}" min="1">
+      <label class="f">Ingredients <span class="muted">(qty · unit · item)</span></label>
+      <div id="ingRows">${ingRows}</div>
+      <button class="btn soft sm" id="addIngBtn" style="margin:2px 0 14px">+ Add ingredient</button>
+      <div class="btnrow">
+        ${recipe ? '<button class="btn danger" data-action="delete-recipe">Delete</button>' : '<button class="btn ghost" data-action="close-modal">Cancel</button>'}
+        <button class="btn primary" data-action="save-recipe">Save recipe</button>
+      </div>`;
+    $("overlay").classList.add("open");
+    $("recName").focus();
+  }
+  function ingRowHtml(qty, unit, name){
+    const opts = ["", "g","kg","ml","L","cup","tbsp","tsp","each","head","bunch","can","pack","x"].map(u => `<option ${u===unit?"selected":""}>${u}</option>`).join("");
+    const catNames = CAT.map(c => c.name).join('","');
+    return `<div class="ing-row">
+      <input class="q" type="number" step="any" value="${qty||""}" placeholder="Qty">
+      <select class="u">${opts}</select>
+      <input class="n" type="text" list="catNames" value="${esc(name||"")}" placeholder="Item (e.g. chicken breast)">
+      <button class="x" data-action="rm-ing">✕</button>
+    </div>`;
+  }
+
+  function readRecipeForm(){
+    const name = ($("recName").value || "").trim();
+    if(!name){ toast("Give the recipe a name"); return null; }
+    const baseServings = parseFloat($("recServes").value) || 1;
+    const ingredients = [];
+    document.querySelectorAll("#ingRows .ing-row").forEach(row => {
+      const qty = parseFloat(row.querySelector(".q").value);
+      const unit = row.querySelector(".u").value;
+      const nm = (row.querySelector(".n").value || "").trim();
+      if(nm && !isNaN(qty) && qty > 0){
+        ingredients.push({ qty: qtyNum(qty), unit: unit, name: nm, canonicalId: matchCanonical(nm) });
+      }
+    });
+    if(ingredients.length === 0){ toast("Add at least one ingredient"); return null; }
+    return { name, baseServings, ingredients };
+  }
+  function saveRecipeFromForm(){
+    const data = readRecipeForm();
+    if(!data) return;
+    if(editingRecipeId){
+      const idx = STATE.recipes.findIndex(r => r.id === editingRecipeId);
+      if(idx >= 0) STATE.recipes[idx] = Object.assign({}, STATE.recipes[idx], data);
+      toast("Recipe updated");
+    }else{
+      STATE.recipes.push(Object.assign({ id: uid() }, data));
+      toast("Recipe saved 🎉");
+    }
+    saveRecipes();
+    closeModal();
+    renderRecipes();
+    renderPlan();
+  }
+
+  /* ---------- SPECIALS ---------- */
+  function renderSpecials(){
+    const el = $("specialsContent");
+    const list = hasPlan() ? buildShoppingList() : null;
+    const aldi = CAT.filter(c => c.aldiSpecial);
+
+    let html = `<div class="card"><h2>Aldi Special Buys 🔥</h2>`;
+    html += aldi.map(c => {
+      const sp = c.aldiSpecial;
+      const unitPrice = sp.price/sp.q;
+      const u = sp.u === "kg" ? "kg" : sp.u === "L" ? "L" : "each";
+      const sizeLabel = sp.u === "kg" ? Math.round(sp.q*1000)+"g" : sp.u === "L" ? sp.q+"L" : (sp.q>1 ? sp.q+" pack" : "each");
+      return `<div class="kv"><span>${esc(c.name)} <span class="muted">(${sizeLabel})</span></span>
+        <b>${fmtAUD(sp.price)} <span class="muted" style="font-weight:400">${fmtAUD2(unitPrice)}/${u}</span></b></div>`;
+    }).join("");
+    html += `<p class="hint">Aldi specials rotate Wednesday & Saturday. Items route to Aldi only when they beat your other stores.</p></div>`;
+
+    if(list){
+      const matching = list.entries.filter(e => {
+        const o = chosenOpt(list, e.id);
+        return o && (o.special || (o.wasPrice && o.wasPrice > o.prod.p));
+      });
+      if(matching.length > 0){
+        html += `<div class="card"><h2>On special in your list 🏷️</h2>`;
+        html += matching.map(e => {
+          const o = chosenOpt(list, e.id);
+          const save = o.wasPrice && o.wasPrice > o.prod.p ? o.wasPrice - o.prod.p : null;
+          return `<div class="kv"><span>${esc(e.cat.name)} <span class="muted">· ${esc(o.prod.n||"")}</span></span>
+            <b>${fmtAUD(o.prod.p)}${save?` <span class="muted" style="font-weight:400;text-decoration:line-through">${fmtAUD(o.wasPrice)}</span>`:""}</b></div>`;
+        }).join("");
+        html += `</div>`;
+      } else {
+        html += `<div class="card empty" style="padding:20px"><div class="fx">🛎️</div><b>No specials match your list</b><p class="muted">Specials matching your meal plan will appear here.</p></div>`;
+      }
+    } else {
+      html += `<div class="card empty" style="padding:20px"><div class="fx">📅</div><b>Plan your meals first</b><p class="muted">We'll show specials that match your list.</p></div>`;
+    }
+    el.innerHTML = html;
+  }
+  function hasPlan(){ return (STATE.plan.days||[]).some(d => (d.recipeIds||[]).length > 0); }
+
+  /* ---------- MORE ---------- */
+  function renderMore(){
+    $("stColes").checked = !!STATE.settings.stores.coles;
+    $("stWool").checked = !!STATE.settings.stores.woolworths;
+    $("stAldi").checked = !!STATE.settings.stores.aldi;
+    $("splitSlider").value = Math.round(STATE.settings.splitPref*100);
+    $("minSaving").value = STATE.settings.minSaving;
+    $("maxStores").value = String(STATE.settings.maxStores);
+    applyTheme();
+    const f = FEED_META;
+    $("priceFreshness").textContent = f.generatedAt
+      ? "Prices refreshed " + new Date(f.generatedAt).toLocaleString() + " via the price feed."
+      : "Using built-in seed prices. Once the GitHub price feed is live, prices refresh automatically.";
+  }
+
+  /* ---------- modal ---------- */
+  function closeModal(){ $("overlay").classList.remove("open"); }
+
+  /* ---------- actions ---------- */
+  function onAction(action, node){
+    switch(action){
+      case "goto-recipes": showTab("recipes"); break;
+      case "goto-plan": showTab("plan"); break;
+      case "goto-specials": showTab("specials"); break;
+      case "goto-more": showTab("more"); break;
+      case "toggle": toggleItem(node); break;
+      case "pick-recipe": openPicker(parseInt(node.dataset.day,10)); break;
+      case "remove-meal": removeMeal(parseInt(node.dataset.day,10), node.dataset.rid); break;
+      case "edit-recipe": openRecipeEditor(STATE.recipes.find(r => r.id === node.dataset.id)); break;
+      case "new-recipe": openRecipeEditor(null); break;
+      case "save-recipe": saveRecipeFromForm(); break;
+      case "delete-recipe": deleteRecipe(); break;
+      case "close-modal": closeModal(); break;
+      case "rm-ing": node.closest(".ing-row").remove(); break;
+      case "add-recipe-to-day": addRecipeToDay(parseInt(node.dataset.day,10), node.dataset.rid, parseInt(node.dataset.srv||"1",10)); break;
+    }
+  }
+
+  function toggleItem(node){
+    const store = node.dataset.store, id = node.dataset.id, kind = node.dataset.kind;
+    const amount = parseInt(node.dataset.amount,10)/10;
+    const key = checkedKey(store, id, amount, kind);
+    STATE.checked[key] = !STATE.checked[key];
+    saveChecked();
+    renderHome();
+  }
+
+  function removeMeal(day, rid){
+    const d = STATE.plan.days[day];
+    d.recipeIds = (d.recipeIds||[]).filter(x => x !== rid);
+    if(d.servings) delete d.servings[rid];
+    savePlan(); renderPlan();
+  }
+
+  function openPicker(day){
+    if(STATE.recipes.length === 0){ toast("Add a recipe first"); showTab("recipes"); return; }
+    $("sheet").innerHTML = `<h3>Add a meal — Day ${day+1}</h3>` +
+      STATE.recipes.map(r => `
+        <div class="recipe" style="border-bottom:1px solid var(--line);cursor:default">
+          <div class="av">🍽️</div>
+          <div class="main"><div class="nm">${esc(r.name)}</div><div class="sub">serves ${r.baseServings||1}</div></div>
+          <button class="btn sm primary" data-action="add-recipe-to-day" data-day="${day}" data-rid="${r.id}" data-srv="${r.baseServings||1}">Add</button>
+        </div>`).join("") +
+      `<div class="btnrow" style="margin-top:14px"><button class="btn ghost" data-action="close-modal">Done</button></div>`;
+    $("overlay").classList.add("open");
+  }
+
+  function addRecipeToDay(day, rid, srv){
+    const d = STATE.plan.days[day];
+    if(!d.recipeIds) d.recipeIds = [];
+    if(!d.servings) d.servings = {};
+    d.recipeIds.push(rid);
+    d.servings[rid] = srv;
+    savePlan();
+    closeModal();
+    renderPlan();
+  }
+
+  function deleteRecipe(){
+    STATE.recipes = STATE.recipes.filter(r => r.id !== editingRecipeId);
+    STATE.plan.days.forEach(d => { if(d.recipeIds) d.recipeIds = d.recipeIds.filter(x => x !== editingRecipeId); });
+    saveRecipes(); savePlan();
+    closeModal();
+    toast("Recipe deleted");
+    renderRecipes(); renderPlan();
+  }
+
+  /* ---------- wire events ---------- */
+  function wire(){
+    document.addEventListener("click", ev => {
+      const b = ev.target.closest("[data-action]");
+      if(b) onAction(b.dataset.action, b);
+      const tabBtn = ev.target.closest("#tabbar button[data-tab]");
+      if(tabBtn && !b) showTab(tabBtn.dataset.tab);
+      if(ev.target.closest(".overlay") === $("overlay") && !ev.target.closest(".sheet")) closeModal();
+    });
+    document.querySelectorAll("#tabbar button[data-tab]").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+    document.querySelectorAll("#periodSeg button").forEach(b => b.addEventListener("click", () => {
+      STATE.plan.period = parseInt(b.dataset.period,10); savePlan(); renderPlan();
+    }));
+    document.querySelectorAll("#themeSeg button").forEach(b => b.addEventListener("click", () => {
+      STATE.settings.theme = b.dataset.themeVal; saveSettings(); applyTheme();
+    }));
+    $("parseBtn").addEventListener("click", () => { pasteItems = parseFreeText($("pasteBox").value); renderParsePreview(); });
+    $("pasteBox").addEventListener("input", () => { $("parseBtn").disabled = !$("pasteBox").value.trim(); });
+    $("saveParsedBtn").addEventListener("click", () => {
+      const name = ($("pasteBox").value.split(/[\n,]/)[0] || "Pasted recipe").trim().slice(0,40) || "Pasted recipe";
+      const ingredients = pasteItems.map(it => ({ qty: it.qty, unit: it.unit, name: it.name, canonicalId: it.canonicalId }));
+      STATE.recipes.push({ id: uid(), name: name, baseServings: 4, ingredients });
+      saveRecipes();
+      $("pasteBox").value = ""; pasteItems = []; renderParsePreview();
+      toast("Recipe saved 🎉");
+      renderRecipes();
+    });
+    $("newRecipeBtn").addEventListener("click", () => openRecipeEditor(null));
+    $("splitSlider").addEventListener("input", ev => {
+      STATE.settings.splitPref = parseInt(ev.target.value,10)/100; saveSettings();
+    });
+    $("splitSlider").addEventListener("change", () => renderHome());
+    $("minSaving").addEventListener("change", ev => {
+      STATE.settings.minSaving = Math.max(0, parseFloat(ev.target.value)||0); saveSettings(); renderHome();
+    });
+    $("maxStores").addEventListener("change", ev => {
+      STATE.settings.maxStores = parseInt(ev.target.value,10)||3; saveSettings(); renderHome();
+    });
+    $("stColes").addEventListener("change", ev => { STATE.settings.stores.coles = ev.target.checked; saveSettings(); });
+    $("stWool").addEventListener("change", ev => { STATE.settings.stores.woolworths = ev.target.checked; saveSettings(); });
+    $("stAldi").addEventListener("change", ev => { STATE.settings.stores.aldi = ev.target.checked; saveSettings(); });
+    $("resetBtn").addEventListener("click", () => {
+      if(!confirm("Delete all recipes, plans and settings?")) return;
+      if(LS){ LS.removeItem("sa_recipes"); LS.removeItem("sa_plan"); LS.removeItem("sa_settings"); LS.removeItem("sa_checked"); }
+      STATE = loadState(); renderHome(); renderRecipes(); renderPlan(); toast("All data cleared");
+    });
+    $("exportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify({ app:"shopping-app", version:APP_VERSION, recipes:STATE.recipes, plan:STATE.plan, settings:STATE.settings, exportedAt:new Date().toISOString() }, null, 2)], {type:"application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "shopping-app-backup.json"; a.click(); URL.revokeObjectURL(a.href);
+    });
+    $("importBtn").addEventListener("click", () => $("importFile").click());
+    $("importFile").addEventListener("change", ev => {
+      const f = ev.target.files[0]; if(!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        try{
+          const d = JSON.parse(rd.result);
+          if(d.recipes) STATE.recipes = d.recipes;
+          if(d.plan) STATE.plan = d.plan;
+          if(d.settings) STATE.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings);
+          saveRecipes(); savePlan(); saveSettings();
+          renderHome(); renderRecipes(); renderPlan(); toast("Import complete ✓");
+        }catch(e){ toast("Could not read that file"); }
+      };
+      rd.readAsText(f);
+      ev.target.value = "";
+    });
+  }
+
+  function init(){
+    seedAldi();
+    applyTheme();
+    wire();
+    showTab("home");
+    // try live feed (offline/preview safe)
+    fetch("data/prices.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(f => {
+      if(f){ applyFeed(f); renderHome(); renderSpecials(); renderMore(); }
+    }).catch(() => {});
+    // sync badge (local-first)
+    $("syncTxt").textContent = "saved locally";
+    // service worker
+    if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  }
+
+  return { init, showTab, renderHome, renderPlan, renderRecipes, renderSpecials, renderMore };
+})() : null;
+
+if(UI){ UI.init(); }
+</script>
+</body>
+</html>
