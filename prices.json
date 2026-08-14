@@ -1,0 +1,3221 @@
+{
+  "generatedAt": "2026-08-13T03:00:00+08:00",
+  "status": "ok",
+  "currency": "AUD",
+  "note": "Seed feed generated from the built-in catalogue. The home-device scraper (device-scraper/) or the GitHub Action replaces this with live prices.",
+  "stores": {
+    "coles": {
+      "source": "seed",
+      "asOf": "2026-08-13T03:00:00+08:00",
+      "items": [
+        {
+          "id": "chicken-breast",
+          "name": "Chicken Breast",
+          "price": 6,
+          "wasPrice": 7.5,
+          "onSpecial": true,
+          "promo": "Down Down"
+        },
+        {
+          "id": "chicken-thigh",
+          "name": "Chicken Thigh Fillets",
+          "price": 5.5,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "beef-mince",
+          "name": "Beef Mince",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bacon",
+          "name": "Bacon",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sausages",
+          "name": "Beef Sausages",
+          "price": 5.5,
+          "wasPrice": 6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "salmon",
+          "name": "Salmon Fillets",
+          "price": 9,
+          "wasPrice": 10,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tuna",
+          "name": "Tinned Tuna",
+          "price": 1,
+          "wasPrice": 1.1,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "eggs",
+          "name": "Eggs",
+          "price": 4.5,
+          "wasPrice": 5.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "milk",
+          "name": "Milk",
+          "price": 3.1,
+          "wasPrice": 3.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "butter",
+          "name": "Butter",
+          "price": 3.2,
+          "wasPrice": 3.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cheddar",
+          "name": "Cheddar Cheese",
+          "price": 5.5,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mozzarella",
+          "name": "Mozzarella",
+          "price": 5.8,
+          "wasPrice": 6.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "yoghurt",
+          "name": "Greek Yoghurt",
+          "price": 5,
+          "wasPrice": 5.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cream",
+          "name": "Cream",
+          "price": 2.8,
+          "wasPrice": 3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "broccoli",
+          "name": "Broccoli",
+          "price": 2.9,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "carrots",
+          "name": "Carrots",
+          "price": 1.9,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "onion",
+          "name": "Brown Onion",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "potato",
+          "name": "Potatoes",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sweet-potato",
+          "name": "Sweet Potato",
+          "price": 3.9,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "spinach",
+          "name": "Baby Spinach",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lettuce",
+          "name": "Lettuce",
+          "price": 2.2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "capsicum",
+          "name": "Capsicum",
+          "price": 1.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cucumber",
+          "name": "Cucumber",
+          "price": 1.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tomato",
+          "name": "Tomatoes",
+          "price": 3.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "avocado",
+          "name": "Avocado",
+          "price": 1.7,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "banana",
+          "name": "Bananas",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "apple",
+          "name": "Apples",
+          "price": 3.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "orange",
+          "name": "Oranges",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lemon",
+          "name": "Lemons",
+          "price": 0.6,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lime",
+          "name": "Limes",
+          "price": 0.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "garlic",
+          "name": "Garlic",
+          "price": 0.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "ginger",
+          "name": "Ginger",
+          "price": 22,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chilli",
+          "name": "Chilli",
+          "price": 0.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mushrooms",
+          "name": "Mushrooms",
+          "price": 10,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "spring-onion",
+          "name": "Spring Onions",
+          "price": 1.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "rice",
+          "name": "White Rice",
+          "price": 2,
+          "wasPrice": 2.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pasta",
+          "name": "Pasta",
+          "price": 1.2,
+          "wasPrice": 1.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pasta-sauce",
+          "name": "Pasta Sauce",
+          "price": 2,
+          "wasPrice": 2.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tinned-tomatoes",
+          "name": "Diced Tomatoes",
+          "price": 0.95,
+          "wasPrice": 1.1,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tomato-paste",
+          "name": "Tomato Paste",
+          "price": 1.1,
+          "wasPrice": 1.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "baked-beans",
+          "name": "Baked Beans",
+          "price": 1.3,
+          "wasPrice": 1.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chickpeas",
+          "name": "Chickpeas",
+          "price": 1,
+          "wasPrice": 1.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "black-beans",
+          "name": "Black Beans",
+          "price": 1.1,
+          "wasPrice": 1.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lentils",
+          "name": "Lentils",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "flour",
+          "name": "Plain Flour",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sugar",
+          "name": "White Sugar",
+          "price": 1.7,
+          "wasPrice": 1.9,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "olive-oil",
+          "name": "Olive Oil",
+          "price": 9.5,
+          "wasPrice": 11,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "soy-sauce",
+          "name": "Soy Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "peanut-butter",
+          "name": "Peanut Butter",
+          "price": 3,
+          "wasPrice": 3.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "honey",
+          "name": "Honey",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "oats",
+          "name": "Rolled Oats",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cereal",
+          "name": "Breakfast Cereal",
+          "price": 4,
+          "wasPrice": 4.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "coffee",
+          "name": "Instant Coffee",
+          "price": 8,
+          "wasPrice": 9.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tea",
+          "name": "Tea Bags",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "stock",
+          "name": "Stock Cubes",
+          "price": 1.5,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "paprika",
+          "name": "Paprika",
+          "price": 1.5,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cumin",
+          "name": "Ground Cumin",
+          "price": 1.7,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "garlic-powder",
+          "name": "Garlic Powder",
+          "price": 1.8,
+          "wasPrice": 2.1,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "salt",
+          "name": "Salt",
+          "price": 1.2,
+          "wasPrice": 1.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pepper",
+          "name": "Black Pepper",
+          "price": 1.6,
+          "wasPrice": 1.9,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "corn",
+          "name": "Corn Kernels",
+          "price": 1.1,
+          "wasPrice": 1.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bread",
+          "name": "White Bread",
+          "price": 2.3,
+          "wasPrice": 2.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "wraps",
+          "name": "Wraps",
+          "price": 2.5,
+          "wasPrice": 2.9,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "almonds",
+          "name": "Almonds",
+          "price": 8,
+          "wasPrice": 9,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-peas",
+          "name": "Frozen Peas",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-veg",
+          "name": "Mixed Frozen Vegetables",
+          "price": 3,
+          "wasPrice": 3.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-berries",
+          "name": "Frozen Mixed Berries",
+          "price": 5,
+          "wasPrice": 5.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-chips",
+          "name": "Frozen Chips",
+          "price": 3.8,
+          "wasPrice": 4.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "almond-milk",
+          "name": "Almond Milk",
+          "price": 1.9,
+          "wasPrice": 2.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "orange-juice",
+          "name": "Orange Juice",
+          "price": 4,
+          "wasPrice": 4.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "zucchini",
+          "name": "Zucchini",
+          "price": 1.6,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "eggplant",
+          "name": "Eggplant",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cauliflower",
+          "name": "Cauliflower",
+          "price": 3.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cabbage",
+          "name": "Cabbage",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pumpkin",
+          "name": "Pumpkin",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "celery",
+          "name": "Celery",
+          "price": 3.2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "beetroot",
+          "name": "Beetroot",
+          "price": 1.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "leek",
+          "name": "Leek",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "corn-cob",
+          "name": "Corn Cobs",
+          "price": 1.2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "green-beans",
+          "name": "Green Beans",
+          "price": 6.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "snow-peas",
+          "name": "Snow Peas",
+          "price": 9,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bok-choy",
+          "name": "Bok Choy",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "kale",
+          "name": "Kale",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "rocket",
+          "name": "Rocket",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "basil",
+          "name": "Basil",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "coriander",
+          "name": "Coriander",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "parsley",
+          "name": "Parsley",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mint",
+          "name": "Mint",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "brussels-sprouts",
+          "name": "Brussels Sprouts",
+          "price": 6,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "asparagus",
+          "name": "Asparagus",
+          "price": 3.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "silverbeet",
+          "name": "Silverbeet",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "radish",
+          "name": "Radishes",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "fennel",
+          "name": "Fennel",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bean-sprouts",
+          "name": "Bean Sprouts",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pork-mince",
+          "name": "Pork Mince",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pork-chops",
+          "name": "Pork Chops",
+          "price": 7.5,
+          "wasPrice": 8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pork-roast",
+          "name": "Pork Roast",
+          "price": 11,
+          "wasPrice": 12,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lamb-chops",
+          "name": "Lamb Chops",
+          "price": 14,
+          "wasPrice": 16,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lamb-roast",
+          "name": "Lamb Roast",
+          "price": 13,
+          "wasPrice": 15,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lamb-mince",
+          "name": "Lamb Mince",
+          "price": 8.5,
+          "wasPrice": 9.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "rump-steak",
+          "name": "Rump Steak",
+          "price": 12,
+          "wasPrice": 14,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chuck-steak",
+          "name": "Chuck Steak",
+          "price": 9.5,
+          "wasPrice": 11,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "scotch-fillet",
+          "name": "Scotch Fillet",
+          "price": 16,
+          "wasPrice": 19,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "beef-strips",
+          "name": "Beef Stir-Fry Strips",
+          "price": 8.5,
+          "wasPrice": 9.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "whole-chicken",
+          "name": "Whole Chicken",
+          "price": 8.25,
+          "wasPrice": 9,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chicken-drumsticks",
+          "name": "Chicken Drumsticks",
+          "price": 5.5,
+          "wasPrice": 6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chicken-wings",
+          "name": "Chicken Wings",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chicken-mince",
+          "name": "Chicken Mince",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "turkey-mince",
+          "name": "Turkey Mince",
+          "price": 7,
+          "wasPrice": 7.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "ham",
+          "name": "Ham",
+          "price": 4,
+          "wasPrice": 4.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "salami",
+          "name": "Salami",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "prosciutto",
+          "name": "Prosciutto",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "prawns",
+          "name": "Prawns",
+          "price": 18,
+          "wasPrice": 22,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "white-fish",
+          "name": "White Fish Fillets",
+          "price": 7.5,
+          "wasPrice": 8.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "smoked-salmon",
+          "name": "Smoked Salmon",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sour-cream",
+          "name": "Sour Cream",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cream-cheese",
+          "name": "Cream Cheese",
+          "price": 2.8,
+          "wasPrice": 3.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "parmesan",
+          "name": "Parmesan",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "feta",
+          "name": "Feta",
+          "price": 4,
+          "wasPrice": 4.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "ricotta",
+          "name": "Ricotta",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "haloumi",
+          "name": "Haloumi",
+          "price": 5,
+          "wasPrice": 5.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "custard",
+          "name": "Custard",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "ice-cream",
+          "name": "Ice Cream",
+          "price": 4.5,
+          "wasPrice": 5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "buttermilk",
+          "name": "Buttermilk",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "condensed-milk",
+          "name": "Condensed Milk",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "margarine",
+          "name": "Margarine",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "quinoa",
+          "name": "Quinoa",
+          "price": 5.5,
+          "wasPrice": 6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "couscous",
+          "name": "Couscous",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "brown-rice",
+          "name": "Brown Rice",
+          "price": 2.3,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "arborio-rice",
+          "name": "Arborio Rice",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "rice-noodles",
+          "name": "Rice Noodles",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "egg-noodles",
+          "name": "Egg Noodles",
+          "price": 2.8,
+          "wasPrice": 3.2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "instant-noodles",
+          "name": "Instant Noodles",
+          "price": 4.5,
+          "wasPrice": 5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "split-peas",
+          "name": "Split Peas",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mixed-beans",
+          "name": "Mixed Beans",
+          "price": 1.4,
+          "wasPrice": 1.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "passata",
+          "name": "Tomato Passata",
+          "price": 2.3,
+          "wasPrice": 2.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "coconut-milk",
+          "name": "Coconut Milk",
+          "price": 1.5,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "white-vinegar",
+          "name": "White Vinegar",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "apple-cider-vinegar",
+          "name": "Apple Cider Vinegar",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "balsamic-vinegar",
+          "name": "Balsamic Vinegar",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mustard",
+          "name": "Dijon Mustard",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mayonnaise",
+          "name": "Mayonnaise",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tomato-sauce",
+          "name": "Tomato Sauce",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bbq-sauce",
+          "name": "BBQ Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sweet-chilli",
+          "name": "Sweet Chilli Sauce",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sriracha",
+          "name": "Sriracha",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "fish-sauce",
+          "name": "Fish Sauce",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "oyster-sauce",
+          "name": "Oyster Sauce",
+          "price": 2.3,
+          "wasPrice": 2.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "worcestershire",
+          "name": "Worcestershire Sauce",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sesame-oil",
+          "name": "Sesame Oil",
+          "price": 4,
+          "wasPrice": 4.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "canola-oil",
+          "name": "Canola Oil",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "brown-sugar",
+          "name": "Brown Sugar",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "icing-sugar",
+          "name": "Icing Sugar",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "golden-syrup",
+          "name": "Golden Syrup",
+          "price": 3,
+          "wasPrice": 3.4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "maple-syrup",
+          "name": "Maple Syrup",
+          "price": 6.5,
+          "wasPrice": 7.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "vanilla-extract",
+          "name": "Vanilla Extract",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cocoa-powder",
+          "name": "Cocoa Powder",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "baking-powder",
+          "name": "Baking Powder",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bicarb-soda",
+          "name": "Bicarbonate Soda",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cornflour",
+          "name": "Cornflour",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "breadcrumbs",
+          "name": "Breadcrumbs",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "curry-powder",
+          "name": "Curry Powder",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "turmeric",
+          "name": "Turmeric",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "chilli-flakes",
+          "name": "Chilli Flakes",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cinnamon",
+          "name": "Cinnamon",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "nutmeg",
+          "name": "Nutmeg",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "oregano",
+          "name": "Oregano",
+          "price": 1.5,
+          "wasPrice": 1.7,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "mixed-herbs",
+          "name": "Mixed Herbs",
+          "price": 1.5,
+          "wasPrice": 1.7,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "dark-chocolate",
+          "name": "Dark Chocolate",
+          "price": 2.5,
+          "wasPrice": 3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "tortilla-chips",
+          "name": "Corn Chips",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "crackers",
+          "name": "Crackers",
+          "price": 2,
+          "wasPrice": 2.3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "rice-cakes",
+          "name": "Rice Cakes",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "popcorn",
+          "name": "Popcorn Kernels",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "jam",
+          "name": "Jam",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "veg-emite",
+          "name": "Vegemite",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-spinach",
+          "name": "Frozen Spinach",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-corn",
+          "name": "Frozen Corn",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-broccoli",
+          "name": "Frozen Broccoli",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cauliflower-rice",
+          "name": "Cauliflower Rice",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-schnitzel",
+          "name": "Chicken Schnitzel",
+          "price": 5.5,
+          "wasPrice": 6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-fish-fillets",
+          "name": "Frozen Fish Fillets",
+          "price": 5,
+          "wasPrice": 5.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-pizza",
+          "name": "Frozen Pizza",
+          "price": 4.5,
+          "wasPrice": 5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "dumplings",
+          "name": "Dumplings",
+          "price": 6.5,
+          "wasPrice": 7.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "frozen-mango",
+          "name": "Frozen Mango",
+          "price": 4.5,
+          "wasPrice": 5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "garlic-bread",
+          "name": "Garlic Bread",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "burger-buns",
+          "name": "Burger Buns",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bread-rolls",
+          "name": "Bread Rolls",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "croissants",
+          "name": "Croissants",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "english-muffins",
+          "name": "English Muffins",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "pita-bread",
+          "name": "Pita Bread",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "crumpets",
+          "name": "Crumpets",
+          "price": 2.3,
+          "wasPrice": 2.6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bagels",
+          "name": "Bagels",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sourdough",
+          "name": "Sourdough Bread",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "sparkling-water",
+          "name": "Sparkling Water",
+          "price": 1.5,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "lemonade",
+          "name": "Lemonade",
+          "price": 1.5,
+          "wasPrice": 1.8,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cordial",
+          "name": "Cordial",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "coconut-water",
+          "name": "Coconut Water",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "kombucha",
+          "name": "Kombucha",
+          "price": 2.5,
+          "wasPrice": 3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "hot-chocolate",
+          "name": "Hot Chocolate",
+          "price": 4.5,
+          "wasPrice": 5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "toilet-paper",
+          "name": "Toilet Paper",
+          "price": 5.5,
+          "wasPrice": 6.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "paper-towel",
+          "name": "Paper Towel",
+          "price": 3.5,
+          "wasPrice": 4,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "dish-liquid",
+          "name": "Dishwashing Liquid",
+          "price": 2.5,
+          "wasPrice": 3,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "laundry-liquid",
+          "name": "Laundry Liquid",
+          "price": 5,
+          "wasPrice": 6,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "bin-bags",
+          "name": "Bin Bags",
+          "price": 4,
+          "wasPrice": 4.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "foil",
+          "name": "Aluminium Foil",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "cling-wrap",
+          "name": "Cling Wrap",
+          "price": 3,
+          "wasPrice": 3.5,
+          "onSpecial": false,
+          "promo": null
+        },
+        {
+          "id": "baking-paper",
+          "name": "Baking Paper",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false,
+          "promo": null
+        }
+      ]
+    },
+    "woolworths": {
+      "source": "seed",
+      "asOf": "2026-08-13T03:00:00+08:00",
+      "items": [
+        {
+          "id": "chicken-breast",
+          "name": "Chicken Breast",
+          "price": 11,
+          "wasPrice": 12,
+          "onSpecial": false
+        },
+        {
+          "id": "chicken-thigh",
+          "name": "Chicken Thigh Fillets",
+          "price": 10.5,
+          "wasPrice": 11,
+          "onSpecial": false
+        },
+        {
+          "id": "beef-mince",
+          "name": "Beef Mince",
+          "price": 12,
+          "wasPrice": 12.5,
+          "onSpecial": false
+        },
+        {
+          "id": "bacon",
+          "name": "Bacon",
+          "price": 4.2,
+          "wasPrice": 4.5,
+          "onSpecial": false
+        },
+        {
+          "id": "sausages",
+          "name": "Beef Sausages",
+          "price": 5.8,
+          "wasPrice": 6.2,
+          "onSpecial": false
+        },
+        {
+          "id": "salmon",
+          "name": "Salmon Fillets",
+          "price": 9.5,
+          "wasPrice": 10.5,
+          "onSpecial": false
+        },
+        {
+          "id": "tuna",
+          "name": "Tinned Tuna",
+          "price": 1.1,
+          "wasPrice": 1.2,
+          "onSpecial": false
+        },
+        {
+          "id": "eggs",
+          "name": "Eggs",
+          "price": 4.8,
+          "wasPrice": 5.8,
+          "onSpecial": false
+        },
+        {
+          "id": "milk",
+          "name": "Milk",
+          "price": 3.1,
+          "wasPrice": 3.3,
+          "onSpecial": false
+        },
+        {
+          "id": "butter",
+          "name": "Butter",
+          "price": 3.4,
+          "wasPrice": 3.6,
+          "onSpecial": false
+        },
+        {
+          "id": "cheddar",
+          "name": "Cheddar Cheese",
+          "price": 5.8,
+          "wasPrice": 6.5,
+          "onSpecial": false
+        },
+        {
+          "id": "mozzarella",
+          "name": "Mozzarella",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false
+        },
+        {
+          "id": "yoghurt",
+          "name": "Greek Yoghurt",
+          "price": 5.2,
+          "wasPrice": 5.6,
+          "onSpecial": false
+        },
+        {
+          "id": "cream",
+          "name": "Cream",
+          "price": 3,
+          "wasPrice": 3.2,
+          "onSpecial": false
+        },
+        {
+          "id": "broccoli",
+          "name": "Broccoli",
+          "price": 3.2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "carrots",
+          "name": "Carrots",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "onion",
+          "name": "Brown Onion",
+          "price": 2.7,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "potato",
+          "name": "Potatoes",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "sweet-potato",
+          "name": "Sweet Potato",
+          "price": 4.2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "spinach",
+          "name": "Baby Spinach",
+          "price": 2.8,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "lettuce",
+          "name": "Lettuce",
+          "price": 2.5,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "capsicum",
+          "name": "Capsicum",
+          "price": 1.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "cucumber",
+          "name": "Cucumber",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "tomato",
+          "name": "Tomatoes",
+          "price": 3.9,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "avocado",
+          "name": "Avocado",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "banana",
+          "name": "Bananas",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "apple",
+          "name": "Apples",
+          "price": 3.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "orange",
+          "name": "Oranges",
+          "price": 3.3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "lemon",
+          "name": "Lemons",
+          "price": 0.75,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "lime",
+          "name": "Limes",
+          "price": 0.9,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "garlic",
+          "name": "Garlic",
+          "price": 0.95,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "ginger",
+          "name": "Ginger",
+          "price": 24,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "chilli",
+          "name": "Chilli",
+          "price": 0.6,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "mushrooms",
+          "name": "Mushrooms",
+          "price": 11,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "spring-onion",
+          "name": "Spring Onions",
+          "price": 2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "rice",
+          "name": "White Rice",
+          "price": 2.1,
+          "wasPrice": 2.2,
+          "onSpecial": false
+        },
+        {
+          "id": "pasta",
+          "name": "Pasta",
+          "price": 1.2,
+          "wasPrice": 1.4,
+          "onSpecial": false
+        },
+        {
+          "id": "pasta-sauce",
+          "name": "Pasta Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "tinned-tomatoes",
+          "name": "Diced Tomatoes",
+          "price": 1,
+          "wasPrice": 1.15,
+          "onSpecial": false
+        },
+        {
+          "id": "tomato-paste",
+          "name": "Tomato Paste",
+          "price": 1.2,
+          "wasPrice": 1.4,
+          "onSpecial": false
+        },
+        {
+          "id": "baked-beans",
+          "name": "Baked Beans",
+          "price": 1.4,
+          "wasPrice": 1.6,
+          "onSpecial": false
+        },
+        {
+          "id": "chickpeas",
+          "name": "Chickpeas",
+          "price": 1.1,
+          "wasPrice": 1.3,
+          "onSpecial": false
+        },
+        {
+          "id": "black-beans",
+          "name": "Black Beans",
+          "price": 1.2,
+          "wasPrice": 1.4,
+          "onSpecial": false
+        },
+        {
+          "id": "lentils",
+          "name": "Lentils",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "flour",
+          "name": "Plain Flour",
+          "price": 1.7,
+          "wasPrice": 1.8,
+          "onSpecial": false
+        },
+        {
+          "id": "sugar",
+          "name": "White Sugar",
+          "price": 1.8,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "olive-oil",
+          "name": "Olive Oil",
+          "price": 10,
+          "wasPrice": 11.5,
+          "onSpecial": false
+        },
+        {
+          "id": "soy-sauce",
+          "name": "Soy Sauce",
+          "price": 2.4,
+          "wasPrice": 2.6,
+          "onSpecial": false
+        },
+        {
+          "id": "peanut-butter",
+          "name": "Peanut Butter",
+          "price": 3.2,
+          "wasPrice": 3.5,
+          "onSpecial": false
+        },
+        {
+          "id": "honey",
+          "name": "Honey",
+          "price": 4,
+          "wasPrice": 4.3,
+          "onSpecial": false
+        },
+        {
+          "id": "oats",
+          "name": "Rolled Oats",
+          "price": 2,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "cereal",
+          "name": "Breakfast Cereal",
+          "price": 4.2,
+          "wasPrice": 4.6,
+          "onSpecial": false
+        },
+        {
+          "id": "coffee",
+          "name": "Instant Coffee",
+          "price": 8.5,
+          "wasPrice": 9.5,
+          "onSpecial": false
+        },
+        {
+          "id": "tea",
+          "name": "Tea Bags",
+          "price": 3.7,
+          "wasPrice": 4,
+          "onSpecial": false
+        },
+        {
+          "id": "stock",
+          "name": "Stock Cubes",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false
+        },
+        {
+          "id": "paprika",
+          "name": "Paprika",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false
+        },
+        {
+          "id": "cumin",
+          "name": "Ground Cumin",
+          "price": 1.8,
+          "wasPrice": 2,
+          "onSpecial": false
+        },
+        {
+          "id": "garlic-powder",
+          "name": "Garlic Powder",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "salt",
+          "name": "Salt",
+          "price": 1.3,
+          "wasPrice": 1.4,
+          "onSpecial": false
+        },
+        {
+          "id": "pepper",
+          "name": "Black Pepper",
+          "price": 1.7,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "corn",
+          "name": "Corn Kernels",
+          "price": 1.2,
+          "wasPrice": 1.3,
+          "onSpecial": false
+        },
+        {
+          "id": "bread",
+          "name": "White Bread",
+          "price": 2.5,
+          "wasPrice": 2.7,
+          "onSpecial": false
+        },
+        {
+          "id": "wraps",
+          "name": "Wraps",
+          "price": 2.8,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "almonds",
+          "name": "Almonds",
+          "price": 8.5,
+          "wasPrice": 9.5,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-peas",
+          "name": "Frozen Peas",
+          "price": 2.7,
+          "wasPrice": 2.9,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-veg",
+          "name": "Mixed Frozen Vegetables",
+          "price": 3.2,
+          "wasPrice": 3.5,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-berries",
+          "name": "Frozen Mixed Berries",
+          "price": 5.5,
+          "wasPrice": 6,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-chips",
+          "name": "Frozen Chips",
+          "price": 4,
+          "wasPrice": 4.4,
+          "onSpecial": false
+        },
+        {
+          "id": "almond-milk",
+          "name": "Almond Milk",
+          "price": 2.1,
+          "wasPrice": 2.3,
+          "onSpecial": false
+        },
+        {
+          "id": "orange-juice",
+          "name": "Orange Juice",
+          "price": 4.2,
+          "wasPrice": 4.5,
+          "onSpecial": false
+        },
+        {
+          "id": "zucchini",
+          "name": "Zucchini",
+          "price": 1.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "eggplant",
+          "name": "Eggplant",
+          "price": 2.2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "cauliflower",
+          "name": "Cauliflower",
+          "price": 3.9,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "cabbage",
+          "name": "Cabbage",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "pumpkin",
+          "name": "Pumpkin",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "celery",
+          "name": "Celery",
+          "price": 3.5,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "beetroot",
+          "name": "Beetroot",
+          "price": 1.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "leek",
+          "name": "Leek",
+          "price": 2.3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "corn-cob",
+          "name": "Corn Cobs",
+          "price": 1.4,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "green-beans",
+          "name": "Green Beans",
+          "price": 7,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "snow-peas",
+          "name": "Snow Peas",
+          "price": 10,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "bok-choy",
+          "name": "Bok Choy",
+          "price": 2.3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "kale",
+          "name": "Kale",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "rocket",
+          "name": "Rocket",
+          "price": 2.8,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "basil",
+          "name": "Basil",
+          "price": 3.2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "coriander",
+          "name": "Coriander",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "parsley",
+          "name": "Parsley",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "mint",
+          "name": "Mint",
+          "price": 3,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "brussels-sprouts",
+          "name": "Brussels Sprouts",
+          "price": 6.5,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "asparagus",
+          "name": "Asparagus",
+          "price": 3.9,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "silverbeet",
+          "name": "Silverbeet",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "radish",
+          "name": "Radishes",
+          "price": 2.2,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "fennel",
+          "name": "Fennel",
+          "price": 2.8,
+          "wasPrice": null,
+          "onSpecial": false
+        },
+        {
+          "id": "bean-sprouts",
+          "name": "Bean Sprouts",
+          "price": 2,
+          "wasPrice": 2.2,
+          "onSpecial": false
+        },
+        {
+          "id": "pork-mince",
+          "name": "Pork Mince",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false
+        },
+        {
+          "id": "pork-chops",
+          "name": "Pork Chops",
+          "price": 8,
+          "wasPrice": 8.5,
+          "onSpecial": false
+        },
+        {
+          "id": "pork-roast",
+          "name": "Pork Roast",
+          "price": 12,
+          "wasPrice": 13,
+          "onSpecial": false
+        },
+        {
+          "id": "lamb-chops",
+          "name": "Lamb Chops",
+          "price": 15,
+          "wasPrice": 17,
+          "onSpecial": false
+        },
+        {
+          "id": "lamb-roast",
+          "name": "Lamb Roast",
+          "price": 14,
+          "wasPrice": 16,
+          "onSpecial": false
+        },
+        {
+          "id": "lamb-mince",
+          "name": "Lamb Mince",
+          "price": 9,
+          "wasPrice": 10,
+          "onSpecial": false
+        },
+        {
+          "id": "rump-steak",
+          "name": "Rump Steak",
+          "price": 13,
+          "wasPrice": 15,
+          "onSpecial": false
+        },
+        {
+          "id": "chuck-steak",
+          "name": "Chuck Steak",
+          "price": 10,
+          "wasPrice": 11.5,
+          "onSpecial": false
+        },
+        {
+          "id": "scotch-fillet",
+          "name": "Scotch Fillet",
+          "price": 17,
+          "wasPrice": 20,
+          "onSpecial": false
+        },
+        {
+          "id": "beef-strips",
+          "name": "Beef Stir-Fry Strips",
+          "price": 9,
+          "wasPrice": 10,
+          "onSpecial": false
+        },
+        {
+          "id": "whole-chicken",
+          "name": "Whole Chicken",
+          "price": 9,
+          "wasPrice": 10,
+          "onSpecial": false
+        },
+        {
+          "id": "chicken-drumsticks",
+          "name": "Chicken Drumsticks",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false
+        },
+        {
+          "id": "chicken-wings",
+          "name": "Chicken Wings",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false
+        },
+        {
+          "id": "chicken-mince",
+          "name": "Chicken Mince",
+          "price": 6.5,
+          "wasPrice": 7,
+          "onSpecial": false
+        },
+        {
+          "id": "turkey-mince",
+          "name": "Turkey Mince",
+          "price": 7.5,
+          "wasPrice": 8,
+          "onSpecial": false
+        },
+        {
+          "id": "ham",
+          "name": "Ham",
+          "price": 4.2,
+          "wasPrice": 4.6,
+          "onSpecial": false
+        },
+        {
+          "id": "salami",
+          "name": "Salami",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "prosciutto",
+          "name": "Prosciutto",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "prawns",
+          "name": "Prawns",
+          "price": 19,
+          "wasPrice": 23,
+          "onSpecial": false
+        },
+        {
+          "id": "white-fish",
+          "name": "White Fish Fillets",
+          "price": 8,
+          "wasPrice": 9,
+          "onSpecial": false
+        },
+        {
+          "id": "smoked-salmon",
+          "name": "Smoked Salmon",
+          "price": 7,
+          "wasPrice": 7.5,
+          "onSpecial": false
+        },
+        {
+          "id": "sour-cream",
+          "name": "Sour Cream",
+          "price": 2.8,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "cream-cheese",
+          "name": "Cream Cheese",
+          "price": 3,
+          "wasPrice": 3.4,
+          "onSpecial": false
+        },
+        {
+          "id": "parmesan",
+          "name": "Parmesan",
+          "price": 7,
+          "wasPrice": 7.5,
+          "onSpecial": false
+        },
+        {
+          "id": "feta",
+          "name": "Feta",
+          "price": 4.3,
+          "wasPrice": 4.8,
+          "onSpecial": false
+        },
+        {
+          "id": "ricotta",
+          "name": "Ricotta",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "haloumi",
+          "name": "Haloumi",
+          "price": 5.3,
+          "wasPrice": 5.8,
+          "onSpecial": false
+        },
+        {
+          "id": "custard",
+          "name": "Custard",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "ice-cream",
+          "name": "Ice Cream",
+          "price": 4.8,
+          "wasPrice": 5.2,
+          "onSpecial": false
+        },
+        {
+          "id": "buttermilk",
+          "name": "Buttermilk",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "condensed-milk",
+          "name": "Condensed Milk",
+          "price": 2.4,
+          "wasPrice": 2.6,
+          "onSpecial": false
+        },
+        {
+          "id": "margarine",
+          "name": "Margarine",
+          "price": 3.2,
+          "wasPrice": 3.6,
+          "onSpecial": false
+        },
+        {
+          "id": "quinoa",
+          "name": "Quinoa",
+          "price": 5.8,
+          "wasPrice": 6.2,
+          "onSpecial": false
+        },
+        {
+          "id": "couscous",
+          "name": "Couscous",
+          "price": 2.4,
+          "wasPrice": 2.6,
+          "onSpecial": false
+        },
+        {
+          "id": "brown-rice",
+          "name": "Brown Rice",
+          "price": 2.4,
+          "wasPrice": 2.6,
+          "onSpecial": false
+        },
+        {
+          "id": "arborio-rice",
+          "name": "Arborio Rice",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "rice-noodles",
+          "name": "Rice Noodles",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "egg-noodles",
+          "name": "Egg Noodles",
+          "price": 3,
+          "wasPrice": 3.4,
+          "onSpecial": false
+        },
+        {
+          "id": "instant-noodles",
+          "name": "Instant Noodles",
+          "price": 4.8,
+          "wasPrice": 5.2,
+          "onSpecial": false
+        },
+        {
+          "id": "split-peas",
+          "name": "Split Peas",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "mixed-beans",
+          "name": "Mixed Beans",
+          "price": 1.5,
+          "wasPrice": 1.7,
+          "onSpecial": false
+        },
+        {
+          "id": "passata",
+          "name": "Tomato Passata",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false
+        },
+        {
+          "id": "coconut-milk",
+          "name": "Coconut Milk",
+          "price": 1.6,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "white-vinegar",
+          "name": "White Vinegar",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "apple-cider-vinegar",
+          "name": "Apple Cider Vinegar",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "balsamic-vinegar",
+          "name": "Balsamic Vinegar",
+          "price": 3.3,
+          "wasPrice": 3.7,
+          "onSpecial": false
+        },
+        {
+          "id": "mustard",
+          "name": "Dijon Mustard",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "mayonnaise",
+          "name": "Mayonnaise",
+          "price": 3.2,
+          "wasPrice": 3.6,
+          "onSpecial": false
+        },
+        {
+          "id": "tomato-sauce",
+          "name": "Tomato Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "bbq-sauce",
+          "name": "BBQ Sauce",
+          "price": 2.4,
+          "wasPrice": 2.7,
+          "onSpecial": false
+        },
+        {
+          "id": "sweet-chilli",
+          "name": "Sweet Chilli Sauce",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "sriracha",
+          "name": "Sriracha",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "fish-sauce",
+          "name": "Fish Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "oyster-sauce",
+          "name": "Oyster Sauce",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false
+        },
+        {
+          "id": "worcestershire",
+          "name": "Worcestershire Sauce",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "sesame-oil",
+          "name": "Sesame Oil",
+          "price": 4.3,
+          "wasPrice": 4.8,
+          "onSpecial": false
+        },
+        {
+          "id": "canola-oil",
+          "name": "Canola Oil",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "brown-sugar",
+          "name": "Brown Sugar",
+          "price": 2,
+          "wasPrice": 2.2,
+          "onSpecial": false
+        },
+        {
+          "id": "icing-sugar",
+          "name": "Icing Sugar",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "golden-syrup",
+          "name": "Golden Syrup",
+          "price": 3.2,
+          "wasPrice": 3.5,
+          "onSpecial": false
+        },
+        {
+          "id": "maple-syrup",
+          "name": "Maple Syrup",
+          "price": 7,
+          "wasPrice": 8,
+          "onSpecial": false
+        },
+        {
+          "id": "vanilla-extract",
+          "name": "Vanilla Extract",
+          "price": 3.3,
+          "wasPrice": 3.7,
+          "onSpecial": false
+        },
+        {
+          "id": "cocoa-powder",
+          "name": "Cocoa Powder",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "baking-powder",
+          "name": "Baking Powder",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "bicarb-soda",
+          "name": "Bicarbonate Soda",
+          "price": 1.7,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "cornflour",
+          "name": "Cornflour",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "breadcrumbs",
+          "name": "Breadcrumbs",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "curry-powder",
+          "name": "Curry Powder",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "turmeric",
+          "name": "Turmeric",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "chilli-flakes",
+          "name": "Chilli Flakes",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "cinnamon",
+          "name": "Cinnamon",
+          "price": 1.7,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "nutmeg",
+          "name": "Nutmeg",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "oregano",
+          "name": "Oregano",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false
+        },
+        {
+          "id": "mixed-herbs",
+          "name": "Mixed Herbs",
+          "price": 1.6,
+          "wasPrice": 1.8,
+          "onSpecial": false
+        },
+        {
+          "id": "dark-chocolate",
+          "name": "Dark Chocolate",
+          "price": 2.7,
+          "wasPrice": 3.2,
+          "onSpecial": false
+        },
+        {
+          "id": "tortilla-chips",
+          "name": "Corn Chips",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "crackers",
+          "name": "Crackers",
+          "price": 2.2,
+          "wasPrice": 2.5,
+          "onSpecial": false
+        },
+        {
+          "id": "rice-cakes",
+          "name": "Rice Cakes",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "popcorn",
+          "name": "Popcorn Kernels",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "jam",
+          "name": "Jam",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "veg-emite",
+          "name": "Vegemite",
+          "price": 3.7,
+          "wasPrice": 4.1,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-spinach",
+          "name": "Frozen Spinach",
+          "price": 1.9,
+          "wasPrice": 2.1,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-corn",
+          "name": "Frozen Corn",
+          "price": 2.4,
+          "wasPrice": 2.6,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-broccoli",
+          "name": "Frozen Broccoli",
+          "price": 2.7,
+          "wasPrice": 2.9,
+          "onSpecial": false
+        },
+        {
+          "id": "cauliflower-rice",
+          "name": "Cauliflower Rice",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-schnitzel",
+          "name": "Chicken Schnitzel",
+          "price": 6,
+          "wasPrice": 6.5,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-fish-fillets",
+          "name": "Frozen Fish Fillets",
+          "price": 5.3,
+          "wasPrice": 5.8,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-pizza",
+          "name": "Frozen Pizza",
+          "price": 4.8,
+          "wasPrice": 5.2,
+          "onSpecial": false
+        },
+        {
+          "id": "dumplings",
+          "name": "Dumplings",
+          "price": 7,
+          "wasPrice": 8,
+          "onSpecial": false
+        },
+        {
+          "id": "frozen-mango",
+          "name": "Frozen Mango",
+          "price": 4.8,
+          "wasPrice": 5.2,
+          "onSpecial": false
+        },
+        {
+          "id": "garlic-bread",
+          "name": "Garlic Bread",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "burger-buns",
+          "name": "Burger Buns",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "bread-rolls",
+          "name": "Bread Rolls",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "croissants",
+          "name": "Croissants",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "english-muffins",
+          "name": "English Muffins",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "pita-bread",
+          "name": "Pita Bread",
+          "price": 2.4,
+          "wasPrice": 2.7,
+          "onSpecial": false
+        },
+        {
+          "id": "crumpets",
+          "name": "Crumpets",
+          "price": 2.5,
+          "wasPrice": 2.8,
+          "onSpecial": false
+        },
+        {
+          "id": "bagels",
+          "name": "Bagels",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        },
+        {
+          "id": "sourdough",
+          "name": "Sourdough Bread",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "sparkling-water",
+          "name": "Sparkling Water",
+          "price": 1.6,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "lemonade",
+          "name": "Lemonade",
+          "price": 1.6,
+          "wasPrice": 1.9,
+          "onSpecial": false
+        },
+        {
+          "id": "cordial",
+          "name": "Cordial",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "coconut-water",
+          "name": "Coconut Water",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "kombucha",
+          "name": "Kombucha",
+          "price": 2.7,
+          "wasPrice": 3.2,
+          "onSpecial": false
+        },
+        {
+          "id": "hot-chocolate",
+          "name": "Hot Chocolate",
+          "price": 4.8,
+          "wasPrice": 5.2,
+          "onSpecial": false
+        },
+        {
+          "id": "toilet-paper",
+          "name": "Toilet Paper",
+          "price": 5.8,
+          "wasPrice": 6.8,
+          "onSpecial": false
+        },
+        {
+          "id": "paper-towel",
+          "name": "Paper Towel",
+          "price": 3.8,
+          "wasPrice": 4.2,
+          "onSpecial": false
+        },
+        {
+          "id": "dish-liquid",
+          "name": "Dishwashing Liquid",
+          "price": 2.7,
+          "wasPrice": 3.2,
+          "onSpecial": false
+        },
+        {
+          "id": "laundry-liquid",
+          "name": "Laundry Liquid",
+          "price": 5.3,
+          "wasPrice": 6.3,
+          "onSpecial": false
+        },
+        {
+          "id": "bin-bags",
+          "name": "Bin Bags",
+          "price": 4.3,
+          "wasPrice": 4.8,
+          "onSpecial": false
+        },
+        {
+          "id": "foil",
+          "name": "Aluminium Foil",
+          "price": 3.2,
+          "wasPrice": 3.7,
+          "onSpecial": false
+        },
+        {
+          "id": "cling-wrap",
+          "name": "Cling Wrap",
+          "price": 3.2,
+          "wasPrice": 3.7,
+          "onSpecial": false
+        },
+        {
+          "id": "baking-paper",
+          "name": "Baking Paper",
+          "price": 2.7,
+          "wasPrice": 3,
+          "onSpecial": false
+        }
+      ]
+    },
+    "aldi": {
+      "source": "specials-catalogue",
+      "asOf": "2026-08-13T03:00:00+08:00",
+      "specials": [
+        {
+          "id": "eggs",
+          "name": "Eggs",
+          "price": 3.99,
+          "q": 12,
+          "u": "each",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "milk",
+          "name": "Milk",
+          "price": 2.79,
+          "q": 2,
+          "u": "L",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "butter",
+          "name": "Butter",
+          "price": 2.49,
+          "q": 0.25,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "cheddar",
+          "name": "Cheddar Cheese",
+          "price": 4.99,
+          "q": 0.5,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "coffee",
+          "name": "Instant Coffee",
+          "price": 6.99,
+          "q": 0.2,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "olive-oil",
+          "name": "Olive Oil",
+          "price": 8.99,
+          "q": 0.75,
+          "u": "L",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "frozen-berries",
+          "name": "Frozen Mixed Berries",
+          "price": 4.49,
+          "q": 0.5,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "pasta",
+          "name": "Pasta",
+          "price": 0.99,
+          "q": 0.5,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "tomato",
+          "name": "Tomatoes",
+          "price": 2.99,
+          "q": 1,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        },
+        {
+          "id": "banana",
+          "name": "Bananas",
+          "price": 1.99,
+          "q": 1,
+          "u": "kg",
+          "until": "2026-08-19",
+          "note": "Special Buy"
+        }
+      ]
+    }
+  }
+}

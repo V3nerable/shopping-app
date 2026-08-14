@@ -1,0 +1,25 @@
+services:
+  scraper:
+    build: .
+    container_name: shopping-price-feeder
+    restart: unless-stopped
+    environment:
+      - GH_TOKEN=${GH_TOKEN}
+      - GH_REPO=${GH_REPO}
+      - GIT_NAME=${GIT_NAME:-Shopping Price Feeder}
+      - GIT_EMAIL=${GIT_EMAIL:-price-feeder@local}
+      - PROFILE_DIR=/profile
+      - REPO_DIR=/repo
+      - CATALOGUE_PATH=/catalogue.json
+      # Optional overrides (defaults in scraper.mjs):
+      # - CRON_FULL=0 19 * * *        (daily 03:00 AWST)
+      # - CRON_SPECIALS=0 0 * * 3     (Wed 08:00 AWST)
+      # - RUN_ONCE=1                  (one run then exit — testing)
+    volumes:
+      - profile:/profile          # persistent browser profile (sessions survive restarts)
+      - repo:/repo                # git clone of your repo (source of truth for the feed)
+      - ../scraper/catalogue.json:/catalogue.json:ro   # item catalogue (host file)
+
+volumes:
+  profile:
+  repo:
