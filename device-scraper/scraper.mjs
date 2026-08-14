@@ -1,5 +1,5 @@
 /**
- * Shopping App — home-device price feeder (v0.09)
+ * Shopping App — home-device price feeder (v0.10)
  * ================================================================
  * Runs on an always-on device on your RESIDENTIAL IP, so it sails past the
  * bot walls (Akamai / Incapsula) that block datacenter IPs. A real Chromium
@@ -167,10 +167,45 @@ async function scrapeAldi() {
 /* ---------------- Coles & Woolworths (browser) -------------------------- */
 async function warmUp(page) {
   for (const url of ["https://www.coles.com.au/", "https://www.woolworths.com.au/"]) {
-    try { await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 }); }
+    try { await page.goto(url, { waitUntil: "load", timeout: 60000 }); }
     catch (e) { log("warm-up visit failed:", url, e.message); }
+    // Let any bot challenge (Akamai _abck / Incapsula) run and set its session
+    // cookie, then nudge the page so the challenge completes.
+    await new Promise(r => setTimeout(r, 4000));
+    try { await page.evaluate(() => window.scrollBy(0, 700)).catch(() => {}); } catch (e) {}
     await new Promise(r => setTimeout(r, 1500));
   }
+}
+
+/** Stealth browser launch. Headless Chromium is fingerprinted by Akamai /
+    Incapsula, so use full Chromium (new headless, channel "chromium"), strip
+    automation markers, and present a realistic locale/viewport/profile.
+    HEADED=1 forces a headed run (pair with `xvfb-run` in the container). */
+async function launchBrowser() {
+  mkdirSync(PROFILE_DIR, { recursive: true });
+  const headed = process.env.HEADED === "1";
+  const context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    headless: !headed,
+    channel: "chromium",
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--no-sandbox",
+      "--disable-dev-shm-usage"
+    ],
+    viewport: { width: 1366, height: 900 },
+    deviceScaleFactor: 1,
+    hasTouch: false,
+    isMobile: false,
+    locale: "en-AU",
+    timezoneId: "Australia/Perth"
+  });
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+    Object.defineProperty(navigator, "languages", { get: () => ["en-AU", "en"] });
+    Object.defineProperty(navigator, "plugins", { get: () => [1, 2, 3, 4, 5] });
+    window.chrome = window.chrome || { runtime: {} };
+  });
+  return context;
 }
 
 /** Classless DOM extraction: find every "$X.XX" price node, then climb to the
@@ -288,9 +323,9 @@ async function scrapeStore(page, store, label) {
       };
       page.on("response", onResponse);
       try {
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-        await page.waitForTimeout(3000);
-        for (let s = 0; s < 2; s++) { await page.evaluate(() => window.scrollBy(0, 900)).catch(() => {}); await page.waitForTimeout(500); }
+        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+        await page.waitForTimeout(4000);
+        for (let s = 0; s < 4; s++) { await page.evaluate(() => window.scrollBy(0, 900)).catch(() => {}); await page.waitForTimeout(600); }
       } finally {
         page.off("response", onResponse);
       }
@@ -322,7 +357,11 @@ async function scrapeStore(page, store, label) {
 
       if (i === 0) {
         const title = await page.title().catch(() => "(no title)");
-        log(label, "diagnostic — title:", JSON.stringify(title), "| tiles:", tiles.length, "| sample:", tiles[0] ? JSON.stringify(tiles[0]) : "(none)");
+        const finalUrl = page.url();
+        log(label, "diagnostic — title:", JSON.stringify(title), "| url:", finalUrl, "| tiles:", tiles.length, "| sample:", tiles[0] ? JSON.stringify(tiles[0]) : "(none)");
+        if (/access denied|attention required|not a robot|just a moment|captcha|verify you are|incapsula|forbidden|challenge/i.test(title)) {
+          log(label, "BOT-CHALLENGE detected — title:", title);
+        }
       }
     } catch (e) {
       log(label, "failed for", item.id, "-", e.message);
@@ -403,12 +442,7 @@ async function runOnce() {
   // Browser stores
   let ctx;
   try {
-    mkdirSync(PROFILE_DIR, { recursive: true });
-    ctx = await chromium.launchPersistentContext(PROFILE_DIR, {
-      headless: true,
-      viewport: { width: 1280, height: 900 },
-      userAgent: UA
-    });
+    ctx = await launchBrowser();
     const page = ctx.pages()[0] || await ctx.newPage();
     await warmUp(page);
 

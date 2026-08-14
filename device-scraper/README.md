@@ -64,6 +64,14 @@ docker compose run --rm -e RUN_ONCE=1 scraper node scraper.mjs --once
 docker compose run --rm -e QUICK=1 -e RUN_ONCE=1 scraper node scraper.mjs --once
 ```
 
+**If a store still shows "Access Denied" (nuclear option — headed browser):**
+```bash
+docker compose run --rm -e QUICK=1 -e HEADED=1 -e RUN_ONCE=1 scraper xvfb-run node scraper.mjs --once
+```
+The scraper runs stealth headless by default (full Chromium, automation markers
+stripped); `HEADED=1` forces a headed browser under `xvfb-run`, which is the
+most human-like profile and usually clears the last stubborn bot walls.
+
 ## Option B — Plain Linux (no Docker)
 
 1. Install Node 18+ and Chromium:

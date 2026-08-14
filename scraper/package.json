@@ -2,7 +2,7 @@
   "name": "shopping-app-scraper",
   "private": true,
   "type": "module",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Nightly price scraper for the Shopping App price feed (Coles, Woolworths full-line + Aldi Special Buys).",
   "engines": { "node": ">=18" },
   "scripts": {

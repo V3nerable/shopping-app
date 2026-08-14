@@ -119,6 +119,28 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.10 — 2026-08-14 (device-scraper: anti-bot stealth)
+- Root cause found via v0.09 diagnostics: Woolworths returned `title: "Access
+  Denied"` (Akamai) and Coles an empty shell (Incapsula) — headless Chromium
+  is fingerprinted even on a residential IP. Fixes in
+  `device-scraper/scraper.mjs`:
+  - New `launchBrowser()`: full Chromium via `channel: "chromium"` (new
+    headless, not the detectable `chromium-headless-shell`), args
+    `--disable-blink-features=AutomationControlled --no-sandbox
+    --disable-dev-shm-usage`, realistic `viewport 1366x900`, `locale en-AU`,
+    `timezoneId Australia/Perth`, and an `addInitScript` stripping
+    `navigator.webdriver`, spoofing `languages`/`plugins`, adding `window.chrome`.
+    No more forced `userAgent` (Playwright's default UA now matches the
+    bundled Chromium, removing a fingerprint mismatch).
+  - `HEADED=1` env forces a headed run (pair with `xvfb-run` inside the
+    container) as the nuclear anti-bot option; documented in README + compose.
+  - `warmUp()`: waits for `load`, settles 4s so the Akamai/Incapsula challenge
+    can run and set its session cookie, then scrolls.
+  - Scrape loop: 4s settle + 4 scrolls, 60s goto timeout, and on the first
+    item logs title + final URL + tile count + a BOT-CHALLENGE warning when the
+    title matches challenge patterns.
+- Version → v0.10 (scraper + device-scraper package.json → 0.10.0).
+
 ### v0.09 — 2026-08-14 (device-scraper: resilient extraction)
 - Rewrote the Coles/Woolworths extraction (`device-scraper/scraper.mjs`). The
   old CSS-class selectors matched nothing (both stores use obfuscated class

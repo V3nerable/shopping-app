@@ -16,6 +16,7 @@ services:
       # - CRON_SPECIALS=0 0 * * 3     (Wed 08:00 AWST)
       # - RUN_ONCE=1                  (one run then exit — testing)
       # - QUICK=1                     (only 3 items per store — fast verification)
+      # - HEADED=1                    (run a headed browser via xvfb — nuclear anti-bot option)
     volumes:
       - profile:/profile          # persistent browser profile (sessions survive restarts)
       - repo:/repo                # git clone of your repo (source of truth for the feed)
