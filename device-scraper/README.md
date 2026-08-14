@@ -59,6 +59,11 @@ Mini PC ──scrapes──▶ prices.json ──git push──▶ your GitHub r
 docker compose run --rm -e RUN_ONCE=1 scraper node scraper.mjs --once
 ```
 
+**Quick verification (only 3 items per store, ~1 minute):**
+```bash
+docker compose run --rm -e QUICK=1 -e RUN_ONCE=1 scraper node scraper.mjs --once
+```
+
 ## Option B — Plain Linux (no Docker)
 
 1. Install Node 18+ and Chromium:

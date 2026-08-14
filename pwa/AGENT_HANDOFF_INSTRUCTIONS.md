@@ -119,6 +119,33 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.09 — 2026-08-14 (device-scraper: resilient extraction)
+- Rewrote the Coles/Woolworths extraction (`device-scraper/scraper.mjs`). The
+  old CSS-class selectors matched nothing (both stores use obfuscated class
+  names), so both stores came back "no results". New approach — extract
+  loosely, match strictly:
+  - `extractProducts()`: classless DOM walk — find every `$X.XX` text node,
+    climb ancestors to the nearest product name. Junk is fine; the matcher
+    filters it.
+  - Woolworths: intercepts the page's own `/apis/ui/Search/products` JSON
+    response (real browser + residential IP passes Akamai) and parses
+    `Products[].Name/Price/WasPrice/IsSpecial` via `parseWoolApi()`.
+  - Coles (and any Next.js store): `scanProductsJson()` recursively harvests
+    {name, price} objects from any intercepted JSON response, then falls back
+    to `window.__NEXT_DATA__`, then to the DOM walk.
+  - Matching: `matchCatalogue()` fuzzy alias match per tile (ALLOW set extended
+    with store brands: woolworths/coles/aldi/rspca/approved/free-range…), plus
+    a substring fallback; picks the cheapest matching tile.
+  - Fail-fast: zero tiles across the first 3 items aborts the store (~30s)
+    instead of grinding 207 items.
+  - Diagnostics: first-item log line with page title, tile count, and a sample
+    tile; per-item `ok:` / `no match:` lines; end-of-store summary.
+- `QUICK=1` env mode: scrapes only 3 items per store (verification in ~1 min);
+  documented in the header + docker-compose comments.
+- Git commands now time out (120s) via the `run()` wrapper so a hung clone
+  fails fast with "command timed out" instead of hanging silently.
+- Version → v0.09 (scraper + device-scraper package.json → 0.9.0).
+
 ### v0.08 — 2026-08-14 (version alignment)
 - Aligned the two scraper package versions with the app release number:
   `scraper/package.json` 0.1.0 → 0.8.0 and `device-scraper/package.json`
