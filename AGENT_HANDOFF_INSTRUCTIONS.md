@@ -116,6 +116,20 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.05 — 2026-08-14 (onboarding & security hardening)
+- Sample recipes are now surfaced on the empty states: the onboarding home
+  screen (no recipes) and the empty Recipes list both get a
+  **"Load 10 sample recipes"** button (new `data-action="load-samples"` case in
+  `onAction` → `loadSampleRecipes()` + toast + re-render), so testing is obvious
+  from first open instead of hidden behind the Recipes-tab Samples button.
+- `.gitignore` hardened: ignores `.env`, `.env.local`,
+  `device-scraper/repo/`, `device-scraper/profile/` (secrets + runtime
+  artifacts must never be committed).
+- Docs: device-scraper README gains a "Keep your token secret" section;
+  DEPLOY_GUIDE Step 3 now stresses pushing the WHOLE project (not just `pwa`)
+  and adds a secrets warning.
+- Version → v0.05.
+
 ### v0.04 — 2026-08-13 (home-device price feeder + expanded catalogue)
 - NEW `device-scraper/` — a self-contained feeder for an always-on device on a
   residential IP (bypasses the Akamai/Incapsula datacenter blocks):

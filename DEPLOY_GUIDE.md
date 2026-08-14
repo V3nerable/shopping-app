@@ -3,7 +3,7 @@
 Follow these steps in order. You currently have nothing set up — no GitHub
 account/repo, no Netlify. This takes you from zero to a live app on your phone.
 
-**App version: v0.04 · Everything ships in `Shopping-App-v0.04.zip`**
+**App version: v0.05 · Everything ships in `Shopping-App-v0.05.zip`**
 
 ---
 
@@ -11,13 +11,13 @@ account/repo, no Netlify. This takes you from zero to a live app on your phone.
 
 - A free **GitHub** account → https://github.com/signup
 - A free **Netlify** account → https://app.netlify.com/signup (sign up with your GitHub account — it makes Step 5 one click)
-- The file `Shopping-App-v0.04.zip` (download it from the workspace)
+- The file `Shopping-App-v0.05.zip` (download it from the workspace)
 
 ---
 
 ## Step 1 — Download & unzip the app
 
-1. Download `Shopping-App-v0.04.zip` and unzip it.
+1. Download `Shopping-App-v0.05.zip` and unzip it.
 2. You'll get a folder containing:
    - `pwa/` — the app itself
    - `scraper/` — the nightly price scraper
@@ -46,8 +46,9 @@ method in Step 3 (Option B), which picks them up automatically.
 ### Option A — Web upload (no terminal, simplest)
 
 1. On the empty-repo page, click **uploading an existing file** (or **Add file → Upload files**).
-2. Drag **all five items** (the `pwa` folder, `scraper` folder, `.github` folder, `README.md`, `.gitignore`) into the box. GitHub's uploader preserves folder structure.
-   - If your browser won't accept folders, upload file-by-file, recreating the folder names exactly (`pwa/`, `scraper/`, `.github/workflows/`).
+2. Drag **everything from the unzipped folder** (the `pwa` folder, `scraper` folder, `device-scraper` folder, `.github` folder, `README.md`, `DEPLOY_GUIDE.md`, `.gitignore`) into the box. GitHub's uploader preserves folder structure.
+   - ⚠️ **Push the whole project, not just `pwa`.** The repo holds the app, the scrapers, the catalogue, the docs and the workflows; Netlify publishes only `pwa/` out of it, and the device/Action read the rest. If the repo is incomplete (e.g. only `pwa`), the device scraper and fallback feed won't exist.
+   - If your browser won't accept folders, upload file-by-file, recreating the folder names exactly (`pwa/`, `scraper/`, `device-scraper/`, `.github/workflows/`).
 3. Click **Commit changes** (leave the default message).
 
 ### Option B — Git command line
@@ -56,7 +57,7 @@ method in Step 3 (Option B), which picks them up automatically.
 # inside the unzipped folder (where pwa/, scraper/, .github/ live)
 git init
 git add .
-git commit -m "Shopping App v0.04"
+git commit -m "Shopping App v0.05"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/shopping-app.git
 git push -u origin main
@@ -113,7 +114,7 @@ servers, so add a session cookie from your own browser once:
    - **Recipes tab** → paste `500g chicken breast, 2 cups rice, 1 broccoli head` → **Parse** → **Save as recipe**.
    - **Plan tab** → assign the recipe to a couple of days.
    - **Shop tab** → you should see a grouped list with totals, per-store prices, and "Save $X vs Store" notes.
-   - **More tab** → confirm **v0.04** is shown at the bottom.
+   - **More tab** → confirm **v0.05** is shown at the bottom.
 3. If anything looks off, try a hard refresh (or incognito) — the service worker caches aggressively by design.
 
 ---
@@ -134,6 +135,7 @@ It now opens full-screen like a native app and works offline in-store.
 - **GitHub's 60-day rule:** scheduled workflows are disabled if the repo has no activity for 60 days. The device's nightly commit keeps it alive automatically.
 - **If prices show "stale":** either the device is off or a store redesigned its page — check the device logs, or open the Actions tab, and send the log to the agent to patch.
 - **Backups:** the app has **More → Export** which downloads a JSON backup of your recipes/plan/settings.
+- **Secrets:** the `GH_TOKEN` lives only in `device-scraper/.env` on the device. Never paste it into chat, an issue, or a commit — if it leaks, revoke it and make a new one.
 
 ---
 

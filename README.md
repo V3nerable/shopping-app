@@ -103,8 +103,17 @@ WantedBy=multi-user.target
 
 ---
 
-## Schedule
+## Keep your token secret
 
+- The `GH_TOKEN` goes **only** into `.env` on this device. Never paste it into
+  chat, an issue, a commit, or the zip — anything shared. If it ever leaks,
+  revoke it immediately (GitHub → Settings → Developer settings → Personal
+  access tokens) and generate a fresh one.
+- `.env` is already listed in the repo's `.gitignore`, so a normal
+  `git add .` won't commit it — but double-check with `git status` before
+  pushing if you're unsure.
+
+## Schedule
 | Task | Default (UTC) | Your time (AWST) |
 |---|---|---|
 | Full scrape (Coles + Woolworths + Aldi) | daily `0 19 * * *` | **03:00** |

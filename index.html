@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b7a4b">
 <meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
-<title>Shopping App · v0.04</title>
+<title>Shopping App · v0.05</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
@@ -318,7 +318,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     </div>
 
     <div class="card" style="text-align:center">
-      <p class="muted">Shopping App · <b>v0.04</b></p>
+      <p class="muted">Shopping App · <b>v0.05</b></p>
       <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
     </div>
   </section>
@@ -354,12 +354,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 
 <script>
 /* ============================================================
-   SHOPPING APP — v0.04
+   SHOPPING APP — v0.05
    Local-first PWA. Meal plan → aggregated ingredients → price-
    optimised shopping lists split across Coles / Woolworths / Aldi.
    ============================================================ */
 "use strict";
-const APP_VERSION = "v0.04";
+const APP_VERSION = "v0.05";
 const LS = (typeof localStorage !== "undefined") ? localStorage : null;
 
 /* ---------------- helpers ---------------- */
@@ -1472,7 +1472,9 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
             <div class="onboard-step"><span class="n">2</span><div><b>Plan your week</b><div class="muted">Assign meals to days.</div></div></div>
             <div class="onboard-step"><span class="n">3</span><div><b>See your list</b><div class="muted">Auto-split to the cheapest stores.</div></div></div>
           </div>
-          <button class="btn primary" data-action="goto-recipes">Add your first recipe</button>
+          <button class="btn primary" data-action="load-samples">Load 10 sample recipes</button>
+          <div style="height:9px"></div>
+          <button class="btn soft" data-action="goto-recipes">Add your own recipe</button>
         </div>`;
       return;
     }
@@ -1646,7 +1648,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   /* ---------- RECIPES ---------- */
   function renderRecipes(){
     if(STATE.recipes.length === 0){
-      $("recipeList").innerHTML = `<div class="empty" style="padding:16px 6px"><span class="fx">🍳</span><b>No recipes yet</b><p class="muted">Paste one above, or tap + New.</p></div>`;
+      $("recipeList").innerHTML = `<div class="empty" style="padding:16px 6px"><span class="fx">🍳</span><b>No recipes yet</b><p class="muted">Paste one above, or tap + New.</p><button class="btn primary" data-action="load-samples" style="margin-top:10px">Load 10 sample recipes</button></div>`;
     }else{
       $("recipeList").innerHTML = STATE.recipes.map(r => `
         <div class="recipe" data-action="edit-recipe" data-id="${r.id}">
@@ -1810,6 +1812,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   function onAction(action, node){
     switch(action){
       case "goto-recipes": showTab("recipes"); break;
+      case "load-samples": { const added = loadSampleRecipes(); toast(added > 0 ? "Loaded " + added + " sample recipes 🎉" : "Sample recipes already loaded"); renderHome(); renderRecipes(); break; }
       case "goto-plan": showTab("plan"); break;
       case "goto-specials": showTab("specials"); break;
       case "goto-more": showTab("more"); break;
