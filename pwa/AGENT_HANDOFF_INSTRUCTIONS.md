@@ -26,18 +26,21 @@ plan into price-optimised shopping lists split across stores.
 ## 2. Repository layout (drop these onto the repo root)
 
 ```
-.github/workflows/update-prices.yml   ← nightly scraper cron + manual dispatch
+.github/workflows/update-prices.yml   ← fallback scraper cron (Aldi-only when device absent)
 pwa/
   index.html                          ← THE APP (self-contained: inline CSS+JS+catalogue)
   manifest.webmanifest
   sw.js                               ← service worker (cache-first; prices.json network-first)
-  data/prices.json                    ← price feed (seed data until scraper is live)
+  data/prices.json                    ← price feed (seed data until the device/action is live)
   icons/                              ← 192/512/maskable/apple-touch PNGs
   AGENT_HANDOFF_INSTRUCTIONS.md       ← this file
 scraper/
   package.json
-  catalogue.json                      ← curated item list (id, name, aliases)
-  scrape.js                           ← Coles/Woolies/Aldi fetchers + normaliser
+  catalogue.json                      ← curated item list (id, name, aliases) — 207 items
+  scrape.js                           ← Coles/Woolies/Aldi fetchers + normaliser (datacenter fallback)
+device-scraper/
+  Dockerfile / docker-compose.yml / scraper.mjs / .env.example / README.md
+                                      ← home-device feeder (residential IP → real prices)
 README.md
 ```
 
@@ -65,6 +68,16 @@ README.md
   Secrets) if the endpoints start requiring a session cookie.
 - **60-day rule:** GitHub disables scheduled workflows after 60 days of no repo
   activity. The manual "Run workflow" button is the safety net.
+- **Cookie secrets (Coles & Woolworths):** both sites block datacenter IPs
+  (Akamai / Incapsula). To unlock real full-line prices, grab a session cookie
+  from your own browser once and save it as a repo secret
+  (*Settings → Secrets and variables → Actions*): `WOOL_COOKIE` and
+  `COLES_COOKIE`. How: open the site in a normal desktop browser → do one
+  product search so the session is "warmed" → DevTools (F12) → Network →
+  reload → click any request to `woolworths.com.au` (or `coles.com.au`) →
+  Headers → Request Headers → copy the full `cookie:` value → paste as the
+  secret. Cookies expire (days–weeks), so refresh when a store shows "stale"
+  again. Aldi needs no cookie.
 - **Feed schema:** `{ generatedAt, status: "ok"|"stale", currency, stores:
   { coles: {asOf, items:[{id,price,wasPrice,onSpecial,promo}]}, woolworths:
   {...}, aldi: {asOf, specials:[{id,price,size,until,note}]} } }`.
@@ -102,6 +115,117 @@ On every deploy command, bump the version by **exactly 0.01** in ALL of:
 Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
+
+### v0.06 — 2026-08-14 (device-scraper bugfixes)
+- Playwright pinned to 1.62.1 in BOTH `device-scraper/Dockerfile`
+  (`mcr.microsoft.com/playwright:v1.62.1-jammy`) and `package.json`
+  (`"playwright": "1.62.1"` exact, no caret), plus `npx playwright install
+  chromium` at image build — fixes the browser-launch failure
+  ("Executable doesn't exist at /ms-playwright/chromium_headless_shell-1234/…")
+  caused by npm drifting from ^1.44.0 to 1.62.1 while the image stayed 1.44.
+- Fixed git-clone failure ("/repo already exists and is not an empty
+  directory"): the feed is now written AFTER the repo is cloned/pulled.
+  `gitSync()` split into `ensureRepo()` (clone-or-pull, wipes a stale non-git
+  /repo first) + `pushFeed()`; `runOnce()` calls `ensureRepo()` before
+  `loadLastGood()` and writes, then `pushFeed()` at the end.
+- SECURITY: added `redact()` (scrubs `github_pat_*` and `x-access-token:***`)
+  and a `run()` execSync wrapper that pipes output and redacts error messages,
+  so a failed git command can never print the token into logs. All git calls
+  and the top-level error handler now go through them.
+- Version → v0.06.
+
+### v0.05 — 2026-08-14 (onboarding & security hardening)
+- Sample recipes are now surfaced on the empty states: the onboarding home
+  screen (no recipes) and the empty Recipes list both get a
+  **"Load 10 sample recipes"** button (new `data-action="load-samples"` case in
+  `onAction` → `loadSampleRecipes()` + toast + re-render), so testing is obvious
+  from first open instead of hidden behind the Recipes-tab Samples button.
+- `.gitignore` hardened: ignores `.env`, `.env.local`,
+  `device-scraper/repo/`, `device-scraper/profile/` (secrets + runtime
+  artifacts must never be committed).
+- Docs: device-scraper README gains a "Keep your token secret" section;
+  DEPLOY_GUIDE Step 3 now stresses pushing the WHOLE project (not just `pwa`)
+  and adds a secrets warning.
+- Version → v0.05.
+
+### v0.04 — 2026-08-13 (home-device price feeder + expanded catalogue)
+- NEW `device-scraper/` — a self-contained feeder for an always-on device on a
+  residential IP (bypasses the Akamai/Incapsula datacenter blocks):
+  - `Dockerfile` (Playwright browser image + git), `docker-compose.yml`
+    (persistent `profile` volume = warm session, `repo` volume = git clone,
+    catalogue mounted read-only), `scraper.mjs`, `.env.example`, README
+    (Docker / plain-Linux systemd / Windows Task Scheduler).
+  - `scraper.mjs`: Playwright persistent-context Chromium; warm-up visits;
+    DOM-crawl extraction (name + `$price` per product card — resilient to
+    minor redesigns); Coles `search/products?q=` + Woolworths
+    `shop/search/products?searchTerm=`; Aldi via the HTTP special-buys
+    extractor (same as `scraper/scrape.js`); per-store stale/keep-last-good;
+    git clone/pull → write `pwa/data/prices.json` → commit → push (auth via
+    scoped `GH_TOKEN`, repo via `GH_REPO`); node-cron schedule defaults
+    `0 19 * * *` UTC (03:00 AWST daily) + `0 0 * * 3` (08:00 AWST Wed);
+    `--once` test mode.
+  - Netlify tokens NOT needed: device only `git push`es; Netlify auto-publishes.
+- Catalogue expanded 70 → 207 items (produce, meat/poultry/seafood, dairy,
+  pantry, frozen, bakery, drinks, household staples) via `const CAT_EXTRA`
+  pushed onto `CAT` before `CAT_BY_ID` is built. `EACH_G` and `DENS_GML`
+  extended for the new items. Regenerated `scraper/catalogue.json` (207) and
+  the seed `pwa/data/prices.json` from the same source (still deterministic).
+- GitHub Action kept as fallback (now covers the 207-item catalogue).
+- Version → v0.04.
+
+### v0.03 — 2026-08-13 (live scraper wiring)
+- Scraper rewritten against live endpoints:
+  - **Aldi (works, no auth):** Special Buys are SSR'd on
+    `https://www.aldi.com.au/special-buys/{YYYY-MM-DD}` (product tiles:
+    `product-tile__name` + `base-price__regular`). The landing page
+    (`/special-buys`) lists wave dates; the scraper fetches the current +
+    next 2 waves and fuzzy-matches tile names to the catalogue (guarded
+    matcher with an ALLOW qualifier list). Pack size parsed from the tile
+    name ("1kg", "300g", "5 Pack"). Verified live: 2026-08-19 wave →
+    "Italian Style Pork & Beef Sausages 1kg" $13.99, "Jasmine Rice 5kg" $11.99.
+  - **Woolworths:** `POST https://www.woolworths.com.au/apis/ui/Search/products`
+    (confirmed body: Filters/IsSpecial/Location/PageNumber/PageSize/SearchTerm/
+    SortType). Akamai blocks datacenter IPs (403 or silent connection drop) →
+    needs the `WOOL_COOKIE` repo secret.
+  - **Coles:** Next.js site behind Imperva Incapsula. BuildId read from the
+    homepage; data route `/_next/data/{buildId}/search/products.json?q={query}`.
+    Needs the `COLES_COOKIE` repo secret (Incapsula challenge otherwise).
+- Added HTTP timeouts (AbortController, `HTTP_TIMEOUT` env) + a `Blocked`
+  short-circuit so a blocked store fails fast instead of retrying all 70 items.
+- FIXED a latent feed bug: Aldi specials now use numeric `{q,u}` in the feed;
+  the app's `applyFeed` also parses the legacy `size` string ("1kg"/"300g"/…)
+  so an old cached feed can't produce NaN unit prices.
+- App: `applyFeed` now guards null prices and records per-store freshness
+  (`FEED_META.stores`); the More screen shows "live" vs "last known" per store.
+- Generated `pwa/data/prices.json` with live Aldi specials + seed Coles/
+  Woolworths (marked stale). Version → v0.03.
+
+### v0.02 — 2026-08-13
+- Preloaded 10 sample meal-prep recipes (`SAMPLE_RECIPES`), auto-seeded on
+  first-ever run (guarded by `sa_samples_seeded` so intentional deletes don't
+  resurrect them) and re-addable via the "🧪 Samples" button on the Recipes
+  screen (merge-by-name, no duplicates).
+- Parser hardened for copy-pasted recipes: strips checkbox/check/bullet glyphs
+  (☐ ☑ ☒ ▢ • ✓ …), typed bullets (- – — *), "Step N:", and numbered-list
+  markers ("1.", "2)", "3:") — with a dot-guard so "1.5 cups" is never eaten.
+- Added prep-modifier vocabulary (`PREP_MODIFIERS`): comma fragments that are
+  pure instructions ("diced", "grated", "finely chopped", "to taste",
+  "for garnish") are dropped instead of becoming manual items. Later comma
+  fragments are only kept when they look like another ingredient (starts with
+  a qty or matches the catalogue).
+- Added heading/non-item line filtering (`isHeadingLine`) for "Ingredients:",
+  "Method:", "For the sauce:", "Serves 4", etc.
+- Added "salt and pepper" → two items splitting (`splitAnd`) only when both
+  halves match the catalogue.
+- Hardened `matchCanonical`: containment and token-overlap matches now require
+  leftover words to be qualifiers only (`RESIDUAL_OK` = STOPWORDS + DESCRIPTORS,
+  deliberately excluding instruction verbs), and no-quantity lines that are
+  titles (>2 words) or start with an instruction verb (`VERBS`) are dropped —
+  so "Chicken Stir Fry" and "Cook the rice." no longer become items.
+- `parseLine` strips trailing serving notes ("to taste", "for garnish"…) from
+  display names.
+- Version bumped to v0.02 (index title/footer/APP_VERSION, manifest, sw.js,
+  README, DEPLOY_GUIDE).
 
 ### v0.01 — 2026-08-13 (initial release)
 - Self-contained PWA in `pwa/index.html` (inline CSS + JS + ~70-item seed

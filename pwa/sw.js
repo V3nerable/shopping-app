@@ -1,5 +1,5 @@
-/* Shopping App service worker — v0.01 */
-const VERSION = "v0.01";
+/* Shopping App service worker — v0.06 */
+const VERSION = "v0.06";
 const CACHE = "shopping-app-" + VERSION;
 const ASSETS = [
   "./",

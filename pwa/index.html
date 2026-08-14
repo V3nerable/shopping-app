@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b7a4b">
 <meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
-<title>Shopping App · v0.01</title>
+<title>Shopping App · v0.06</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
@@ -254,7 +254,10 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <h2 style="margin:0">My recipes</h2>
-        <button class="btn sm soft" id="newRecipeBtn">+ New</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn sm soft" id="sampleBtn">🧪 Samples</button>
+          <button class="btn sm soft" id="newRecipeBtn">+ New</button>
+        </div>
       </div>
       <div id="recipeList"></div>
     </div>
@@ -315,7 +318,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     </div>
 
     <div class="card" style="text-align:center">
-      <p class="muted">Shopping App · <b>v0.01</b></p>
+      <p class="muted">Shopping App · <b>v0.06</b></p>
       <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
     </div>
   </section>
@@ -351,12 +354,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 
 <script>
 /* ============================================================
-   SHOPPING APP — v0.01
+   SHOPPING APP — v0.06
    Local-first PWA. Meal plan → aggregated ingredients → price-
    optimised shopping lists split across Coles / Woolworths / Aldi.
    ============================================================ */
 "use strict";
-const APP_VERSION = "v0.01";
+const APP_VERSION = "v0.06";
 const LS = (typeof localStorage !== "undefined") ? localStorage : null;
 
 /* ---------------- helpers ---------------- */
@@ -537,8 +540,303 @@ const CAT = [
   {id:"almond-milk", name:"Almond Milk", kind:"volume", aliases:["almond milk","oat milk","soy milk","plant milk"],
     coles:{n:"Coles Almond Milk 1L", q:1, u:"L", p:1.90, w:2.20, s:false}, wool:{n:"Woolworths Almond Milk", q:1, u:"L", p:2.10, w:2.30}},
   {id:"orange-juice", name:"Orange Juice", kind:"volume", aliases:["orange juice","juice","oj"],
-    coles:{n:"Coles Orange Juice 2L", q:2, u:"L", p:4.00, w:4.40, s:false}, wool:{n:"Woolworths Orange Juice", q:2, u:"L", p:4.20, w:4.50}}
+    coles:{n:"Coles Orange Juice 2L", q:2, u:"L", p:4.00, w:4.40, s:0}, wool:{n:"Woolworths Orange Juice", q:2, u:"L", p:4.20, w:4.50}}
 ];
+
+/* ---- expanded catalogue (v0.04) — common meal-prep items ---- */
+const CAT_EXTRA = [
+  /* --- Produce: more veg --- */
+  {id:"zucchini", name:"Zucchini", kind:"count", aliases:["zucchini","zucchinis","courgette","courgettes"],
+    coles:{n:"Coles Zucchini", q:1, u:"each", p:1.60, l:1}, wool:{n:"Woolworths Zucchini", q:1, u:"each", p:1.80, l:1}},
+  {id:"eggplant", name:"Eggplant", kind:"count", aliases:["eggplant","eggplants","aubergine"],
+    coles:{n:"Coles Eggplant", q:1, u:"each", p:2.00, l:1}, wool:{n:"Woolworths Eggplant", q:1, u:"each", p:2.20, l:1}},
+  {id:"cauliflower", name:"Cauliflower", kind:"count", aliases:["cauliflower","cauliflower head","cauli"],
+    coles:{n:"Coles Cauliflower", q:1, u:"each", p:3.50, l:1}, wool:{n:"Woolworths Cauliflower", q:1, u:"each", p:3.90, l:1}},
+  {id:"cabbage", name:"Cabbage", kind:"count", aliases:["cabbage","white cabbage","green cabbage","red cabbage","whole cabbage"],
+    coles:{n:"Coles Green Cabbage", q:1, u:"each", p:2.80, l:1}, wool:{n:"Woolworths Cabbage", q:1, u:"each", p:3.00, l:1}},
+  {id:"pumpkin", name:"Pumpkin", kind:"weight", aliases:["pumpkin","butternut pumpkin","kent pumpkin","butternut","pumpkin pieces"],
+    coles:{n:"Coles Butternut Pumpkin", q:1, u:"kg", p:2.50, l:1}, wool:{n:"Woolworths Butternut Pumpkin", q:1, u:"kg", p:2.80, l:1}},
+  {id:"celery", name:"Celery", kind:"count", aliases:["celery","celery bunch","celery sticks"],
+    coles:{n:"Coles Celery Bunch", q:1, u:"each", p:3.20, l:1}, wool:{n:"Woolworths Celery", q:1, u:"each", p:3.50, l:1}},
+  {id:"beetroot", name:"Beetroot", kind:"count", aliases:["beetroot","beetroots","beet"],
+    coles:{n:"Coles Beetroot", q:1, u:"each", p:1.50, l:1}, wool:{n:"Woolworths Beetroot", q:1, u:"each", p:1.80, l:1}},
+  {id:"leek", name:"Leek", kind:"count", aliases:["leek","leeks"],
+    coles:{n:"Coles Leek", q:1, u:"each", p:2.00, l:1}, wool:{n:"Woolworths Leek", q:1, u:"each", p:2.30, l:1}},
+  {id:"corn-cob", name:"Corn Cobs", kind:"count", aliases:["corn cob","corn cobs","corn on the cob","sweet corn cob"],
+    coles:{n:"Coles Corn Cobs", q:1, u:"each", p:1.20, l:1}, wool:{n:"Woolworths Corn Cob", q:1, u:"each", p:1.40, l:1}},
+  {id:"green-beans", name:"Green Beans", kind:"weight", aliases:["green beans","beans","french beans","string beans","runner beans"],
+    coles:{n:"Coles Green Beans", q:1, u:"kg", p:6.50, l:1}, wool:{n:"Woolworths Green Beans", q:1, u:"kg", p:7.00, l:1}},
+  {id:"snow-peas", name:"Snow Peas", kind:"weight", aliases:["snow peas","snow pea","sugar snap peas","snap peas"],
+    coles:{n:"Coles Snow Peas", q:1, u:"kg", p:9.00, l:1}, wool:{n:"Woolworths Snow Peas", q:1, u:"kg", p:10.00, l:1}},
+  {id:"bok-choy", name:"Bok Choy", kind:"count", aliases:["bok choy","pak choy","pak choi","buk choy","baby bok choy"],
+    coles:{n:"Coles Bok Choy", q:1, u:"each", p:2.00, l:1}, wool:{n:"Woolworths Bok Choy", q:1, u:"each", p:2.30, l:1}},
+  {id:"kale", name:"Kale", kind:"count", aliases:["kale","curly kale","kale bunch","tuscan kale","cavolo nero"],
+    coles:{n:"Coles Kale Bunch", q:1, u:"each", p:2.50, l:1}, wool:{n:"Woolworths Kale", q:1, u:"each", p:2.80, l:1}},
+  {id:"rocket", name:"Rocket", kind:"weight", aliases:["rocket","rocket leaves","arugula","rocket salad"],
+    coles:{n:"Coles Rocket 120g", q:0.12, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Rocket", q:0.12, u:"kg", p:2.80, w:3.00}},
+  {id:"basil", name:"Basil", kind:"count", aliases:["basil","fresh basil","basil bunch","basil leaves"],
+    coles:{n:"Coles Basil Bunch", q:1, u:"each", p:3.00, l:1}, wool:{n:"Woolworths Basil", q:1, u:"each", p:3.20, l:1}},
+  {id:"coriander", name:"Coriander", kind:"count", aliases:["coriander","fresh coriander","cilantro","coriander bunch"],
+    coles:{n:"Coles Coriander Bunch", q:1, u:"each", p:2.80, l:1}, wool:{n:"Woolworths Coriander", q:1, u:"each", p:3.00, l:1}},
+  {id:"parsley", name:"Parsley", kind:"count", aliases:["parsley","fresh parsley","parsley bunch","flat leaf parsley","curly parsley"],
+    coles:{n:"Coles Parsley Bunch", q:1, u:"each", p:2.80, l:1}, wool:{n:"Woolworths Parsley", q:1, u:"each", p:3.00, l:1}},
+  {id:"mint", name:"Mint", kind:"count", aliases:["mint","fresh mint","mint bunch","mint leaves"],
+    coles:{n:"Coles Mint Bunch", q:1, u:"each", p:2.80, l:1}, wool:{n:"Woolworths Mint", q:1, u:"each", p:3.00, l:1}},
+  {id:"brussels-sprouts", name:"Brussels Sprouts", kind:"weight", aliases:["brussels sprouts","brussel sprouts","sprouts"],
+    coles:{n:"Coles Brussels Sprouts", q:1, u:"kg", p:6.00, l:1}, wool:{n:"Woolworths Brussels Sprouts", q:1, u:"kg", p:6.50, l:1}},
+  {id:"asparagus", name:"Asparagus", kind:"count", aliases:["asparagus","asparagus bunch","green asparagus"],
+    coles:{n:"Coles Asparagus Bunch", q:1, u:"each", p:3.50, l:1}, wool:{n:"Woolworths Asparagus", q:1, u:"each", p:3.90, l:1}},
+  {id:"silverbeet", name:"Silverbeet", kind:"count", aliases:["silverbeet","swiss chard","chard"],
+    coles:{n:"Coles Silverbeet Bunch", q:1, u:"each", p:2.50, l:1}, wool:{n:"Woolworths Silverbeet", q:1, u:"each", p:2.80, l:1}},
+  {id:"radish", name:"Radishes", kind:"count", aliases:["radish","radishes","radish bunch"],
+    coles:{n:"Coles Radish Bunch", q:1, u:"each", p:2.00, l:1}, wool:{n:"Woolworths Radishes", q:1, u:"each", p:2.20, l:1}},
+  {id:"fennel", name:"Fennel", kind:"count", aliases:["fennel","fennel bulb"],
+    coles:{n:"Coles Fennel", q:1, u:"each", p:2.50, l:1}, wool:{n:"Woolworths Fennel", q:1, u:"each", p:2.80, l:1}},
+  {id:"bean-sprouts", name:"Bean Sprouts", kind:"weight", aliases:["bean sprouts","bean shoot","mung bean sprouts"],
+    coles:{n:"Coles Bean Sprouts", q:0.25, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Bean Sprouts", q:0.25, u:"kg", p:2.00, w:2.20}},
+
+  /* --- Meat, poultry & seafood --- */
+  {id:"pork-mince", name:"Pork Mince", kind:"weight", aliases:["pork mince","minced pork","pork mince meat"],
+    coles:{n:"Coles Pork Mince", q:0.5, u:"kg", p:6.00, w:6.50}, wool:{n:"Woolworths Pork Mince", q:0.5, u:"kg", p:6.50, w:7.00}},
+  {id:"pork-chops", name:"Pork Chops", kind:"weight", aliases:["pork chops","pork chop","pork loin chops"],
+    coles:{n:"Coles Pork Loin Chops", q:0.5, u:"kg", p:7.50, w:8.00}, wool:{n:"Woolworths Pork Chops", q:0.5, u:"kg", p:8.00, w:8.50}},
+  {id:"pork-roast", name:"Pork Roast", kind:"weight", aliases:["pork roast","pork loin roast","pork shoulder","pork leg"],
+    coles:{n:"Coles Pork Loin Roast", q:1, u:"kg", p:11.00, w:12.00}, wool:{n:"Woolworths Pork Roast", q:1, u:"kg", p:12.00, w:13.00}},
+  {id:"lamb-chops", name:"Lamb Chops", kind:"weight", aliases:["lamb chops","lamb chop","lamb cutlets","lamb loin chops"],
+    coles:{n:"Coles Lamb Loin Chops", q:0.5, u:"kg", p:14.00, w:16.00}, wool:{n:"Woolworths Lamb Chops", q:0.5, u:"kg", p:15.00, w:17.00}},
+  {id:"lamb-roast", name:"Lamb Roast", kind:"weight", aliases:["lamb roast","lamb leg","leg of lamb","lamb leg roast","lamb shoulder"],
+    coles:{n:"Coles Lamb Leg Roast", q:1, u:"kg", p:13.00, w:15.00}, wool:{n:"Woolworths Lamb Leg", q:1, u:"kg", p:14.00, w:16.00}},
+  {id:"lamb-mince", name:"Lamb Mince", kind:"weight", aliases:["lamb mince","minced lamb"],
+    coles:{n:"Coles Lamb Mince", q:0.5, u:"kg", p:8.50, w:9.50}, wool:{n:"Woolworths Lamb Mince", q:0.5, u:"kg", p:9.00, w:10.00}},
+  {id:"rump-steak", name:"Rump Steak", kind:"weight", aliases:["rump steak","beef rump","rump"],
+    coles:{n:"Coles Beef Rump Steak", q:0.5, u:"kg", p:12.00, w:14.00}, wool:{n:"Woolworths Rump Steak", q:0.5, u:"kg", p:13.00, w:15.00}},
+  {id:"chuck-steak", name:"Chuck Steak", kind:"weight", aliases:["chuck steak","beef chuck","gravy beef","casserole steak"],
+    coles:{n:"Coles Beef Chuck Steak", q:0.5, u:"kg", p:9.50, w:11.00}, wool:{n:"Woolworths Chuck Steak", q:0.5, u:"kg", p:10.00, w:11.50}},
+  {id:"scotch-fillet", name:"Scotch Fillet", kind:"weight", aliases:["scotch fillet","scotch fillet steak","rib fillet","rib eye","ribeye"],
+    coles:{n:"Coles Scotch Fillet", q:0.5, u:"kg", p:16.00, w:19.00}, wool:{n:"Woolworths Scotch Fillet", q:0.5, u:"kg", p:17.00, w:20.00}},
+  {id:"beef-strips", name:"Beef Stir-Fry Strips", kind:"weight", aliases:["beef strips","stir fry beef","stir fry strips","beef stir fry strips"],
+    coles:{n:"Coles Beef Stir Fry Strips", q:0.5, u:"kg", p:8.50, w:9.50}, wool:{n:"Woolworths Beef Stir Fry", q:0.5, u:"kg", p:9.00, w:10.00}},
+  {id:"whole-chicken", name:"Whole Chicken", kind:"weight", aliases:["whole chicken","roast chicken","raw whole chicken"],
+    coles:{n:"Coles Whole Chicken", q:1.5, u:"kg", p:8.25, w:9.00}, wool:{n:"Woolworths Whole Chicken", q:1.5, u:"kg", p:9.00, w:10.00}},
+  {id:"chicken-drumsticks", name:"Chicken Drumsticks", kind:"weight", aliases:["drumsticks","chicken drumstick","drumstick"],
+    coles:{n:"Coles Chicken Drumsticks", q:1, u:"kg", p:5.50, w:6.00}, wool:{n:"Woolworths Chicken Drumsticks", q:1, u:"kg", p:6.00, w:6.50}},
+  {id:"chicken-wings", name:"Chicken Wings", kind:"weight", aliases:["chicken wings","chicken wing","wings"],
+    coles:{n:"Coles Chicken Wings", q:1, u:"kg", p:6.00, w:6.50}, wool:{n:"Woolworths Chicken Wings", q:1, u:"kg", p:6.50, w:7.00}},
+  {id:"chicken-mince", name:"Chicken Mince", kind:"weight", aliases:["chicken mince","minced chicken"],
+    coles:{n:"Coles Chicken Mince", q:0.5, u:"kg", p:6.00, w:6.50}, wool:{n:"Woolworths Chicken Mince", q:0.5, u:"kg", p:6.50, w:7.00}},
+  {id:"turkey-mince", name:"Turkey Mince", kind:"weight", aliases:["turkey mince","minced turkey"],
+    coles:{n:"Coles Turkey Mince", q:0.5, u:"kg", p:7.00, w:7.50}, wool:{n:"Woolworths Turkey Mince", q:0.5, u:"kg", p:7.50, w:8.00}},
+  {id:"ham", name:"Ham", kind:"weight", aliases:["ham","sliced ham","leg ham","shaved ham","deli ham"],
+    coles:{n:"Coles Leg Ham (sliced)", q:0.2, u:"kg", p:4.00, w:4.40}, wool:{n:"Woolworths Ham", q:0.2, u:"kg", p:4.20, w:4.60}},
+  {id:"salami", name:"Salami", kind:"weight", aliases:["salami","sliced salami","deli salami","pepperoni"],
+    coles:{n:"Coles Salami", q:0.1, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Salami", q:0.1, u:"kg", p:2.70, w:3.00}},
+  {id:"prosciutto", name:"Prosciutto", kind:"weight", aliases:["prosciutto","sliced prosciutto"],
+    coles:{n:"Coles Prosciutto", q:0.1, u:"kg", p:3.50, w:4.00}, wool:{n:"Woolworths Prosciutto", q:0.1, u:"kg", p:3.80, w:4.20}},
+  {id:"prawns", name:"Prawns", kind:"weight", aliases:["prawns","prawn","king prawns","green prawns","cooked prawns"],
+    coles:{n:"Coles Raw Prawns", q:1, u:"kg", p:18.00, w:22.00}, wool:{n:"Woolworths Prawns", q:1, u:"kg", p:19.00, w:23.00}},
+  {id:"white-fish", name:"White Fish Fillets", kind:"weight", aliases:["white fish","basa","barramundi","fish fillets","barramundi fillets","basa fillets"],
+    coles:{n:"Coles Barramundi Fillets", q:0.3, u:"kg", p:7.50, w:8.50}, wool:{n:"Woolworths Barramundi", q:0.3, u:"kg", p:8.00, w:9.00}},
+  {id:"smoked-salmon", name:"Smoked Salmon", kind:"weight", aliases:["smoked salmon","smoked salmon slices"],
+    coles:{n:"Coles Smoked Salmon 100g", q:0.1, u:"kg", p:6.50, w:7.00}, wool:{n:"Woolworths Smoked Salmon", q:0.1, u:"kg", p:7.00, w:7.50}},
+
+  /* --- Dairy & fridge --- */
+  {id:"sour-cream", name:"Sour Cream", kind:"volume", aliases:["sour cream","lite sour cream"],
+    coles:{n:"Coles Sour Cream 300ml", q:0.3, u:"L", p:2.50, w:2.80}, wool:{n:"Woolworths Sour Cream", q:0.3, u:"L", p:2.80, w:3.00}},
+  {id:"cream-cheese", name:"Cream Cheese", kind:"weight", aliases:["cream cheese","cream cheese block","philly"],
+    coles:{n:"Coles Cream Cheese 250g", q:0.25, u:"kg", p:2.80, w:3.20}, wool:{n:"Woolworths Cream Cheese", q:0.25, u:"kg", p:3.00, w:3.40}},
+  {id:"parmesan", name:"Parmesan", kind:"weight", aliases:["parmesan","parmesan cheese","parmigiano","grated parmesan"],
+    coles:{n:"Coles Parmesan", q:0.25, u:"kg", p:6.50, w:7.00}, wool:{n:"Woolworths Parmesan", q:0.25, u:"kg", p:7.00, w:7.50}},
+  {id:"feta", name:"Feta", kind:"weight", aliases:["feta","feta cheese","greek feta","danish feta"],
+    coles:{n:"Coles Greek Feta", q:0.2, u:"kg", p:4.00, w:4.50}, wool:{n:"Woolworths Feta", q:0.2, u:"kg", p:4.30, w:4.80}},
+  {id:"ricotta", name:"Ricotta", kind:"weight", aliases:["ricotta","ricotta cheese"],
+    coles:{n:"Coles Ricotta 375g", q:0.375, u:"kg", p:3.50, w:4.00}, wool:{n:"Woolworths Ricotta", q:0.375, u:"kg", p:3.80, w:4.20}},
+  {id:"haloumi", name:"Haloumi", kind:"weight", aliases:["haloumi","halloumi","haloumi cheese"],
+    coles:{n:"Coles Haloumi 180g", q:0.18, u:"kg", p:5.00, w:5.50}, wool:{n:"Woolworths Haloumi", q:0.18, u:"kg", p:5.30, w:5.80}},
+  {id:"custard", name:"Custard", kind:"volume", aliases:["custard","vanilla custard","thick custard"],
+    coles:{n:"Coles Vanilla Custard 1L", q:1, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Custard", q:1, u:"L", p:3.80, w:4.20}},
+  {id:"ice-cream", name:"Ice Cream", kind:"volume", aliases:["ice cream","vanilla ice cream","icecream"],
+    coles:{n:"Coles Vanilla Ice Cream 2L", q:2, u:"L", p:4.50, w:5.00}, wool:{n:"Woolworths Ice Cream", q:2, u:"L", p:4.80, w:5.20}},
+  {id:"buttermilk", name:"Buttermilk", kind:"volume", aliases:["buttermilk"],
+    coles:{n:"Coles Buttermilk 600ml", q:0.6, u:"L", p:2.50, w:2.80}, wool:{n:"Woolworths Buttermilk", q:0.6, u:"L", p:2.70, w:3.00}},
+  {id:"condensed-milk", name:"Condensed Milk", kind:"weight", aliases:["condensed milk","sweetened condensed milk"],
+    coles:{n:"Coles Condensed Milk 395g", q:0.395, u:"kg", p:2.20, w:2.50}, wool:{n:"Woolworths Condensed Milk", q:0.395, u:"kg", p:2.40, w:2.60}},
+  {id:"margarine", name:"Margarine", kind:"weight", aliases:["margarine","table spread","olive spread"],
+    coles:{n:"Coles Margarine 500g", q:0.5, u:"kg", p:3.00, w:3.50}, wool:{n:"Woolworths Margarine", q:0.5, u:"kg", p:3.20, w:3.60}},
+
+  /* --- Pantry --- */
+  {id:"quinoa", name:"Quinoa", kind:"weight", aliases:["quinoa","white quinoa","quinoa grain"],
+    coles:{n:"Coles Quinoa 500g", q:0.5, u:"kg", p:5.50, w:6.00}, wool:{n:"Woolworths Quinoa", q:0.5, u:"kg", p:5.80, w:6.20}},
+  {id:"couscous", name:"Couscous", kind:"weight", aliases:["couscous","cous cous","pearl couscous"],
+    coles:{n:"Coles Couscous 500g", q:0.5, u:"kg", p:2.20, w:2.50}, wool:{n:"Woolworths Couscous", q:0.5, u:"kg", p:2.40, w:2.60}},
+  {id:"brown-rice", name:"Brown Rice", kind:"weight", aliases:["brown rice","wholegrain rice"],
+    coles:{n:"Coles Brown Rice", q:1, u:"kg", p:2.30, w:2.50}, wool:{n:"Woolworths Brown Rice", q:1, u:"kg", p:2.40, w:2.60}},
+  {id:"arborio-rice", name:"Arborio Rice", kind:"weight", aliases:["arborio rice","risotto rice","arborio"],
+    coles:{n:"Coles Arborio Rice", q:0.5, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Arborio Rice", q:0.5, u:"kg", p:2.70, w:3.00}},
+  {id:"rice-noodles", name:"Rice Noodles", kind:"weight", aliases:["rice noodles","rice noodle","vermicelli","pad thai noodles"],
+    coles:{n:"Coles Rice Noodles 375g", q:0.375, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Rice Noodles", q:0.375, u:"kg", p:2.20, w:2.50}},
+  {id:"egg-noodles", name:"Egg Noodles", kind:"weight", aliases:["egg noodles","egg noodle","hokkien noodles","udon noodles"],
+    coles:{n:"Coles Hokkien Noodles 450g", q:0.45, u:"kg", p:2.80, w:3.20}, wool:{n:"Woolworths Egg Noodles", q:0.45, u:"kg", p:3.00, w:3.40}},
+  {id:"instant-noodles", name:"Instant Noodles", kind:"count", aliases:["instant noodles","2 minute noodles","ramen","noodle cups","mi goreng"],
+    coles:{n:"Coles Instant Noodles 5pk", q:5, u:"each", p:4.50, w:5.00}, wool:{n:"Woolworths Instant Noodles", q:5, u:"each", p:4.80, w:5.20}},
+  {id:"split-peas", name:"Split Peas", kind:"weight", aliases:["split peas","yellow split peas","green split peas"],
+    coles:{n:"Coles Yellow Split Peas", q:0.375, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Split Peas", q:0.375, u:"kg", p:1.90, w:2.10}},
+  {id:"mixed-beans", name:"Mixed Beans", kind:"weight", aliases:["mixed beans","four bean mix","bean mix","4 bean mix"],
+    coles:{n:"Coles Four Bean Mix 400g", q:0.4, u:"kg", p:1.40, w:1.60}, wool:{n:"Woolworths Mixed Beans", q:0.4, u:"kg", p:1.50, w:1.70}},
+  {id:"passata", name:"Tomato Passata", kind:"weight", aliases:["passata","tomato passata","sugo"],
+    coles:{n:"Coles Passata 700g", q:0.7, u:"kg", p:2.30, w:2.60}, wool:{n:"Woolworths Passata", q:0.7, u:"kg", p:2.50, w:2.80}},
+  {id:"coconut-milk", name:"Coconut Milk", kind:"volume", aliases:["coconut milk","coconut cream","coconut milk can","coconut cream can"],
+    coles:{n:"Coles Coconut Milk 400ml", q:0.4, u:"L", p:1.50, w:1.80}, wool:{n:"Woolworths Coconut Milk", q:0.4, u:"L", p:1.60, w:1.90}},
+  {id:"white-vinegar", name:"White Vinegar", kind:"volume", aliases:["white vinegar","vinegar"],
+    coles:{n:"Coles White Vinegar 2L", q:2, u:"L", p:2.00, w:2.30}, wool:{n:"Woolworths White Vinegar", q:2, u:"L", p:2.20, w:2.50}},
+  {id:"apple-cider-vinegar", name:"Apple Cider Vinegar", kind:"volume", aliases:["apple cider vinegar","acv","cider vinegar"],
+    coles:{n:"Coles Apple Cider Vinegar", q:0.5, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Apple Cider Vinegar", q:0.5, u:"L", p:3.80, w:4.20}},
+  {id:"balsamic-vinegar", name:"Balsamic Vinegar", kind:"volume", aliases:["balsamic vinegar","balsamic"],
+    coles:{n:"Coles Balsamic Vinegar", q:0.5, u:"L", p:3.00, w:3.50}, wool:{n:"Woolworths Balsamic Vinegar", q:0.5, u:"L", p:3.30, w:3.70}},
+  {id:"mustard", name:"Dijon Mustard", kind:"weight", aliases:["dijon mustard","mustard","dijon","wholegrain mustard","seeded mustard"],
+    coles:{n:"Coles Dijon Mustard 200g", q:0.2, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Dijon Mustard", q:0.2, u:"kg", p:2.70, w:3.00}},
+  {id:"mayonnaise", name:"Mayonnaise", kind:"weight", aliases:["mayonnaise","mayo","whole egg mayo","kewpie"],
+    coles:{n:"Coles Mayonnaise 470g", q:0.47, u:"kg", p:3.00, w:3.50}, wool:{n:"Woolworths Mayonnaise", q:0.47, u:"kg", p:3.20, w:3.60}},
+  {id:"tomato-sauce", name:"Tomato Sauce", kind:"volume", aliases:["tomato sauce","ketchup","sauce"],
+    coles:{n:"Coles Tomato Sauce 500ml", q:0.5, u:"L", p:2.00, w:2.30}, wool:{n:"Woolworths Tomato Sauce", q:0.5, u:"L", p:2.20, w:2.50}},
+  {id:"bbq-sauce", name:"BBQ Sauce", kind:"volume", aliases:["bbq sauce","barbecue sauce"],
+    coles:{n:"Coles BBQ Sauce 500ml", q:0.5, u:"L", p:2.20, w:2.50}, wool:{n:"Woolworths BBQ Sauce", q:0.5, u:"L", p:2.40, w:2.70}},
+  {id:"sweet-chilli", name:"Sweet Chilli Sauce", kind:"volume", aliases:["sweet chilli sauce","sweet chili sauce","sweet chilli"],
+    coles:{n:"Coles Sweet Chilli Sauce 500ml", q:0.5, u:"L", p:2.50, w:2.80}, wool:{n:"Woolworths Sweet Chilli Sauce", q:0.5, u:"L", p:2.70, w:3.00}},
+  {id:"sriracha", name:"Sriracha", kind:"volume", aliases:["sriracha","sriracha sauce","hot sauce"],
+    coles:{n:"Coles Sriracha 285ml", q:0.285, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Sriracha", q:0.285, u:"L", p:3.80, w:4.20}},
+  {id:"fish-sauce", name:"Fish Sauce", kind:"volume", aliases:["fish sauce"],
+    coles:{n:"Coles Fish Sauce 300ml", q:0.3, u:"L", p:2.00, w:2.30}, wool:{n:"Woolworths Fish Sauce", q:0.3, u:"L", p:2.20, w:2.50}},
+  {id:"oyster-sauce", name:"Oyster Sauce", kind:"volume", aliases:["oyster sauce"],
+    coles:{n:"Coles Oyster Sauce 250ml", q:0.25, u:"L", p:2.30, w:2.60}, wool:{n:"Woolworths Oyster Sauce", q:0.25, u:"L", p:2.50, w:2.80}},
+  {id:"worcestershire", name:"Worcestershire Sauce", kind:"volume", aliases:["worcestershire sauce","worcestershire","w sauce"],
+    coles:{n:"Coles Worcestershire Sauce 250ml", q:0.25, u:"L", p:2.00, w:2.30}, wool:{n:"Woolworths Worcestershire Sauce", q:0.25, u:"L", p:2.20, w:2.50}},
+  {id:"sesame-oil", name:"Sesame Oil", kind:"volume", aliases:["sesame oil","toasted sesame oil"],
+    coles:{n:"Coles Sesame Oil 250ml", q:0.25, u:"L", p:4.00, w:4.50}, wool:{n:"Woolworths Sesame Oil", q:0.25, u:"L", p:4.30, w:4.80}},
+  {id:"canola-oil", name:"Canola Oil", kind:"volume", aliases:["canola oil","vegetable oil","cooking oil","sunflower oil"],
+    coles:{n:"Coles Canola Oil 750ml", q:0.75, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Canola Oil", q:0.75, u:"L", p:3.80, w:4.20}},
+  {id:"brown-sugar", name:"Brown Sugar", kind:"weight", aliases:["brown sugar","raw sugar","dark brown sugar"],
+    coles:{n:"Coles Brown Sugar", q:1, u:"kg", p:1.90, w:2.10}, wool:{n:"Woolworths Brown Sugar", q:1, u:"kg", p:2.00, w:2.20}},
+  {id:"icing-sugar", name:"Icing Sugar", kind:"weight", aliases:["icing sugar","icing sugar mixture","confectioners sugar","powdered sugar"],
+    coles:{n:"Coles Icing Sugar", q:0.5, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Icing Sugar", q:0.5, u:"kg", p:1.90, w:2.10}},
+  {id:"golden-syrup", name:"Golden Syrup", kind:"weight", aliases:["golden syrup"],
+    coles:{n:"Coles Golden Syrup 500g", q:0.5, u:"kg", p:3.00, w:3.40}, wool:{n:"Woolworths Golden Syrup", q:0.5, u:"kg", p:3.20, w:3.50}},
+  {id:"maple-syrup", name:"Maple Syrup", kind:"volume", aliases:["maple syrup"],
+    coles:{n:"Coles Maple Syrup 375ml", q:0.375, u:"L", p:6.50, w:7.50}, wool:{n:"Woolworths Maple Syrup", q:0.375, u:"L", p:7.00, w:8.00}},
+  {id:"vanilla-extract", name:"Vanilla Extract", kind:"volume", aliases:["vanilla extract","vanilla essence","vanilla"],
+    coles:{n:"Coles Vanilla Extract 100ml", q:0.1, u:"L", p:3.00, w:3.50}, wool:{n:"Woolworths Vanilla Extract", q:0.1, u:"L", p:3.30, w:3.70}},
+  {id:"cocoa-powder", name:"Cocoa Powder", kind:"weight", aliases:["cocoa powder","cocoa","cacao powder","dutch cocoa"],
+    coles:{n:"Coles Cocoa Powder 250g", q:0.25, u:"kg", p:3.50, w:4.00}, wool:{n:"Woolworths Cocoa Powder", q:0.25, u:"kg", p:3.80, w:4.20}},
+  {id:"baking-powder", name:"Baking Powder", kind:"weight", aliases:["baking powder"],
+    coles:{n:"Coles Baking Powder 300g", q:0.3, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Baking Powder", q:0.3, u:"kg", p:2.20, w:2.50}},
+  {id:"bicarb-soda", name:"Bicarbonate Soda", kind:"weight", aliases:["bicarb soda","bicarbonate soda","baking soda","bicarb"],
+    coles:{n:"Coles Bicarbonate Soda 500g", q:0.5, u:"kg", p:1.60, w:1.80}, wool:{n:"Woolworths Bicarb Soda", q:0.5, u:"kg", p:1.70, w:1.90}},
+  {id:"cornflour", name:"Cornflour", kind:"weight", aliases:["cornflour","corn flour","cornstarch"],
+    coles:{n:"Coles Cornflour 300g", q:0.3, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Cornflour", q:0.3, u:"kg", p:1.90, w:2.10}},
+  {id:"breadcrumbs", name:"Breadcrumbs", kind:"weight", aliases:["breadcrumbs","bread crumbs","panko","panko breadcrumbs"],
+    coles:{n:"Coles Panko Breadcrumbs 300g", q:0.3, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Breadcrumbs", q:0.3, u:"kg", p:2.20, w:2.50}},
+  {id:"curry-powder", name:"Curry Powder", kind:"weight", aliases:["curry powder","mild curry powder"],
+    coles:{n:"Coles Curry Powder 50g", q:0.05, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Curry Powder", q:0.05, u:"kg", p:2.20, w:2.50}},
+  {id:"turmeric", name:"Turmeric", kind:"weight", aliases:["turmeric","ground turmeric","turmeric powder"],
+    coles:{n:"Coles Turmeric 45g", q:0.045, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Turmeric", q:0.045, u:"kg", p:1.90, w:2.10}},
+  {id:"chilli-flakes", name:"Chilli Flakes", kind:"weight", aliases:["chilli flakes","chili flakes","dried chilli","crushed chilli"],
+    coles:{n:"Coles Chilli Flakes 35g", q:0.035, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Chilli Flakes", q:0.035, u:"kg", p:1.90, w:2.10}},
+  {id:"cinnamon", name:"Cinnamon", kind:"weight", aliases:["cinnamon","ground cinnamon","cinnamon powder"],
+    coles:{n:"Coles Cinnamon 45g", q:0.045, u:"kg", p:1.60, w:1.80}, wool:{n:"Woolworths Cinnamon", q:0.045, u:"kg", p:1.70, w:1.90}},
+  {id:"nutmeg", name:"Nutmeg", kind:"weight", aliases:["nutmeg","ground nutmeg"],
+    coles:{n:"Coles Ground Nutmeg 40g", q:0.04, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Nutmeg", q:0.04, u:"kg", p:1.90, w:2.10}},
+  {id:"oregano", name:"Oregano", kind:"weight", aliases:["oregano","dried oregano"],
+    coles:{n:"Coles Oregano 28g", q:0.028, u:"kg", p:1.50, w:1.70}, wool:{n:"Woolworths Oregano", q:0.028, u:"kg", p:1.60, w:1.80}},
+  {id:"mixed-herbs", name:"Mixed Herbs", kind:"weight", aliases:["mixed herbs","dried mixed herbs","italian herbs"],
+    coles:{n:"Coles Mixed Herbs 25g", q:0.025, u:"kg", p:1.50, w:1.70}, wool:{n:"Woolworths Mixed Herbs", q:0.025, u:"kg", p:1.60, w:1.80}},
+  {id:"dark-chocolate", name:"Dark Chocolate", kind:"weight", aliases:["dark chocolate","chocolate block","cooking chocolate","chocolate chips"],
+    coles:{n:"Coles Dark Chocolate 200g", q:0.2, u:"kg", p:2.50, w:3.00}, wool:{n:"Woolworths Dark Chocolate", q:0.2, u:"kg", p:2.70, w:3.20}},
+  {id:"tortilla-chips", name:"Corn Chips", kind:"weight", aliases:["corn chips","tortilla chips","doritos","nachos chips"],
+    coles:{n:"Coles Corn Chips 200g", q:0.2, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Corn Chips", q:0.2, u:"kg", p:2.20, w:2.50}},
+  {id:"crackers", name:"Crackers", kind:"weight", aliases:["crackers","rice crackers","water crackers","savoury crackers"],
+    coles:{n:"Coles Water Crackers 250g", q:0.25, u:"kg", p:2.00, w:2.30}, wool:{n:"Woolworths Crackers", q:0.25, u:"kg", p:2.20, w:2.50}},
+  {id:"rice-cakes", name:"Rice Cakes", kind:"count", aliases:["rice cakes","rice cake","thin rice cakes"],
+    coles:{n:"Coles Rice Cakes 10pk", q:10, u:"each", p:1.80, w:2.00}, wool:{n:"Woolworths Rice Cakes", q:10, u:"each", p:1.90, w:2.10}},
+  {id:"popcorn", name:"Popcorn Kernels", kind:"weight", aliases:["popcorn","popcorn kernels","popping corn"],
+    coles:{n:"Coles Popcorn Kernels 500g", q:0.5, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Popcorn Kernels", q:0.5, u:"kg", p:2.70, w:3.00}},
+  {id:"jam", name:"Jam", kind:"weight", aliases:["jam","strawberry jam","raspberry jam","apricot jam"],
+    coles:{n:"Coles Strawberry Jam 500g", q:0.5, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Jam", q:0.5, u:"kg", p:2.70, w:3.00}},
+  {id:"veg-emite", name:"Vegemite", kind:"weight", aliases:["vegemite","yeast spread"],
+    coles:{n:"Coles Vegemite 220g", q:0.22, u:"kg", p:3.50, w:4.00}, wool:{n:"Woolworths Vegemite", q:0.22, u:"kg", p:3.70, w:4.10}},
+
+  /* --- Frozen --- */
+  {id:"frozen-spinach", name:"Frozen Spinach", kind:"weight", aliases:["frozen spinach","spinach frozen","frozen chopped spinach"],
+    coles:{n:"Coles Frozen Spinach 250g", q:0.25, u:"kg", p:1.80, w:2.00}, wool:{n:"Woolworths Frozen Spinach", q:0.25, u:"kg", p:1.90, w:2.10}},
+  {id:"frozen-corn", name:"Frozen Corn", kind:"weight", aliases:["frozen corn","corn kernels frozen"],
+    coles:{n:"Coles Frozen Corn 500g", q:0.5, u:"kg", p:2.20, w:2.50}, wool:{n:"Woolworths Frozen Corn", q:0.5, u:"kg", p:2.40, w:2.60}},
+  {id:"frozen-broccoli", name:"Frozen Broccoli", kind:"weight", aliases:["frozen broccoli","broccoli florets frozen"],
+    coles:{n:"Coles Frozen Broccoli 500g", q:0.5, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Frozen Broccoli", q:0.5, u:"kg", p:2.70, w:2.90}},
+  {id:"cauliflower-rice", name:"Cauliflower Rice", kind:"weight", aliases:["cauliflower rice","cauli rice","riced cauliflower"],
+    coles:{n:"Coles Cauliflower Rice 300g", q:0.3, u:"kg", p:2.50, w:2.80}, wool:{n:"Woolworths Cauliflower Rice", q:0.3, u:"kg", p:2.70, w:3.00}},
+  {id:"frozen-schnitzel", name:"Chicken Schnitzel", kind:"weight", aliases:["chicken schnitzel","crumbed chicken","frozen schnitzel"],
+    coles:{n:"Coles Crumbed Chicken Schnitzel", q:0.4, u:"kg", p:5.50, w:6.00}, wool:{n:"Woolworths Chicken Schnitzel", q:0.4, u:"kg", p:6.00, w:6.50}},
+  {id:"frozen-fish-fillets", name:"Frozen Fish Fillets", kind:"weight", aliases:["frozen fish","frozen fish fillets","crumbed fish"],
+    coles:{n:"Coles Frozen Fish Fillets", q:0.4, u:"kg", p:5.00, w:5.50}, wool:{n:"Woolworths Frozen Fish", q:0.4, u:"kg", p:5.30, w:5.80}},
+  {id:"frozen-pizza", name:"Frozen Pizza", kind:"count", aliases:["frozen pizza","pizza","margherita pizza"],
+    coles:{n:"Coles Frozen Pizza", q:1, u:"each", p:4.50, w:5.00}, wool:{n:"Woolworths Frozen Pizza", q:1, u:"each", p:4.80, w:5.20}},
+  {id:"dumplings", name:"Dumplings", kind:"weight", aliases:["dumplings","frozen dumplings","gyoza","potstickers","dumpling"],
+    coles:{n:"Coles Pork Dumplings 500g", q:0.5, u:"kg", p:6.50, w:7.50}, wool:{n:"Woolworths Dumplings", q:0.5, u:"kg", p:7.00, w:8.00}},
+  {id:"frozen-mango", name:"Frozen Mango", kind:"weight", aliases:["frozen mango","mango pieces"],
+    coles:{n:"Coles Frozen Mango 500g", q:0.5, u:"kg", p:4.50, w:5.00}, wool:{n:"Woolworths Frozen Mango", q:0.5, u:"kg", p:4.80, w:5.20}},
+  {id:"garlic-bread", name:"Garlic Bread", kind:"count", aliases:["garlic bread","garlic baguette"],
+    coles:{n:"Coles Garlic Bread", q:1, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths Garlic Bread", q:1, u:"each", p:2.70, w:3.00}},
+
+  /* --- Bakery --- */
+  {id:"burger-buns", name:"Burger Buns", kind:"count", aliases:["burger buns","burger bun","hamburger buns","brioche buns"],
+    coles:{n:"Coles Burger Buns 4pk", q:4, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths Burger Buns", q:4, u:"each", p:2.70, w:3.00}},
+  {id:"bread-rolls", name:"Bread Rolls", kind:"count", aliases:["bread rolls","bread roll","dinner rolls","bap rolls"],
+    coles:{n:"Coles Bread Rolls 6pk", q:6, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths Bread Rolls", q:6, u:"each", p:2.70, w:3.00}},
+  {id:"croissants", name:"Croissants", kind:"count", aliases:["croissants","croissant","butter croissants"],
+    coles:{n:"Coles Croissants 4pk", q:4, u:"each", p:3.50, w:4.00}, wool:{n:"Woolworths Croissants", q:4, u:"each", p:3.80, w:4.20}},
+  {id:"english-muffins", name:"English Muffins", kind:"count", aliases:["english muffins","english muffin"],
+    coles:{n:"Coles English Muffins 6pk", q:6, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths English Muffins", q:6, u:"each", p:2.70, w:3.00}},
+  {id:"pita-bread", name:"Pita Bread", kind:"count", aliases:["pita bread","pita","pita pockets","lebanese bread"],
+    coles:{n:"Coles Pita Bread 5pk", q:5, u:"each", p:2.20, w:2.50}, wool:{n:"Woolworths Pita Bread", q:5, u:"each", p:2.40, w:2.70}},
+  {id:"crumpets", name:"Crumpets", kind:"count", aliases:["crumpets","crumpet"],
+    coles:{n:"Coles Crumpets 6pk", q:6, u:"each", p:2.30, w:2.60}, wool:{n:"Woolworths Crumpets", q:6, u:"each", p:2.50, w:2.80}},
+  {id:"bagels", name:"Bagels", kind:"count", aliases:["bagels","bagel"],
+    coles:{n:"Coles Bagels 4pk", q:4, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths Bagels", q:4, u:"each", p:2.70, w:3.00}},
+  {id:"sourdough", name:"Sourdough Bread", kind:"weight", aliases:["sourdough","sourdough bread","sourdough loaf"],
+    coles:{n:"Coles Sourdough Loaf", q:0.65, u:"kg", p:3.50, w:4.00}, wool:{n:"Woolworths Sourdough", q:0.65, u:"kg", p:3.80, w:4.20}},
+
+  /* --- Drinks --- */
+  {id:"sparkling-water", name:"Sparkling Water", kind:"volume", aliases:["sparkling water","soda water","mineral water","sparkling mineral water"],
+    coles:{n:"Coles Sparkling Water 1.25L", q:1.25, u:"L", p:1.50, w:1.80}, wool:{n:"Woolworths Sparkling Water", q:1.25, u:"L", p:1.60, w:1.90}},
+  {id:"lemonade", name:"Lemonade", kind:"volume", aliases:["lemonade","lemon squash","sprite"],
+    coles:{n:"Coles Lemonade 1.25L", q:1.25, u:"L", p:1.50, w:1.80}, wool:{n:"Woolworths Lemonade", q:1.25, u:"L", p:1.60, w:1.90}},
+  {id:"cordial", name:"Cordial", kind:"volume", aliases:["cordial","orange cordial","lime cordial","raspberry cordial"],
+    coles:{n:"Coles Orange Cordial 1L", q:1, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Cordial", q:1, u:"L", p:3.80, w:4.20}},
+  {id:"coconut-water", name:"Coconut Water", kind:"volume", aliases:["coconut water"],
+    coles:{n:"Coles Coconut Water 1L", q:1, u:"L", p:3.50, w:4.00}, wool:{n:"Woolworths Coconut Water", q:1, u:"L", p:3.80, w:4.20}},
+  {id:"kombucha", name:"Kombucha", kind:"volume", aliases:["kombucha","kombucha drink"],
+    coles:{n:"Coles Kombucha 330ml", q:0.33, u:"L", p:2.50, w:3.00}, wool:{n:"Woolworths Kombucha", q:0.33, u:"L", p:2.70, w:3.20}},
+  {id:"hot-chocolate", name:"Hot Chocolate", kind:"weight", aliases:["hot chocolate","drinking chocolate","milo"],
+    coles:{n:"Coles Hot Chocolate 200g", q:0.2, u:"kg", p:4.50, w:5.00}, wool:{n:"Woolworths Hot Chocolate", q:0.2, u:"kg", p:4.80, w:5.20}},
+
+  /* --- Household staples --- */
+  {id:"toilet-paper", name:"Toilet Paper", kind:"count", aliases:["toilet paper","toilet rolls","loo paper"],
+    coles:{n:"Coles Toilet Paper 12pk", q:12, u:"each", p:5.50, w:6.50}, wool:{n:"Woolworths Toilet Paper", q:12, u:"each", p:5.80, w:6.80}},
+  {id:"paper-towel", name:"Paper Towel", kind:"count", aliases:["paper towel","paper towels","kitchen towel"],
+    coles:{n:"Coles Paper Towel 2pk", q:2, u:"each", p:3.50, w:4.00}, wool:{n:"Woolworths Paper Towel", q:2, u:"each", p:3.80, w:4.20}},
+  {id:"dish-liquid", name:"Dishwashing Liquid", kind:"volume", aliases:["dishwashing liquid","dish soap","washing up liquid","dishwashing detergent"],
+    coles:{n:"Coles Dishwashing Liquid 500ml", q:0.5, u:"L", p:2.50, w:3.00}, wool:{n:"Woolworths Dishwashing Liquid", q:0.5, u:"L", p:2.70, w:3.20}},
+  {id:"laundry-liquid", name:"Laundry Liquid", kind:"volume", aliases:["laundry liquid","laundry detergent","washing powder","laundry powder"],
+    coles:{n:"Coles Laundry Liquid 1L", q:1, u:"L", p:5.00, w:6.00}, wool:{n:"Woolworths Laundry Liquid", q:1, u:"L", p:5.30, w:6.30}},
+  {id:"bin-bags", name:"Bin Bags", kind:"count", aliases:["bin bags","garbage bags","rubbish bags","bin liners"],
+    coles:{n:"Coles Bin Bags 40pk", q:40, u:"each", p:4.00, w:4.50}, wool:{n:"Woolworths Bin Bags", q:40, u:"each", p:4.30, w:4.80}},
+  {id:"foil", name:"Aluminium Foil", kind:"count", aliases:["aluminium foil","aluminum foil","foil","tin foil"],
+    coles:{n:"Coles Aluminium Foil 30m", q:1, u:"each", p:3.00, w:3.50}, wool:{n:"Woolworths Aluminium Foil", q:1, u:"each", p:3.20, w:3.70}},
+  {id:"cling-wrap", name:"Cling Wrap", kind:"count", aliases:["cling wrap","glad wrap","plastic wrap"],
+    coles:{n:"Coles Cling Wrap 60m", q:1, u:"each", p:3.00, w:3.50}, wool:{n:"Woolworths Cling Wrap", q:1, u:"each", p:3.20, w:3.70}},
+  {id:"baking-paper", name:"Baking Paper", kind:"count", aliases:["baking paper","parchment paper","greaseproof paper"],
+    coles:{n:"Coles Baking Paper 10m", q:1, u:"each", p:2.50, w:2.80}, wool:{n:"Woolworths Baking Paper", q:1, u:"each", p:2.70, w:3.00}}
+];
+CAT.push(...CAT_EXTRA);
+
 const CAT_BY_ID = {};
 CAT.forEach(c => CAT_BY_ID[c.id] = c);
 
@@ -556,24 +854,136 @@ const ALDI_SPECIALS = [
   {id:"banana", price:1.99, q:1, u:"kg", note:"Special Buy", until:"2026-08-19"}
 ];
 
+/* ---------------- sample meal-prep recipes (preloaded for testing) ---------------- */
+const SAMPLE_RECIPES = [
+  { name:"Chicken Stir Fry", baseServings:4, ingredients:[
+    {qty:500,unit:"g",name:"chicken breast",canonicalId:"chicken-breast"},
+    {qty:2,unit:"cup",name:"rice",canonicalId:"rice"},
+    {qty:1,unit:"each",name:"broccoli",canonicalId:"broccoli"},
+    {qty:1,unit:"each",name:"capsicum",canonicalId:"capsicum"},
+    {qty:3,unit:"tbsp",name:"soy sauce",canonicalId:"soy-sauce"},
+    {qty:2,unit:"clove",name:"garlic",canonicalId:"garlic"},
+    {qty:1,unit:"each",name:"onion",canonicalId:"onion"},
+    {qty:25,unit:"g",name:"ginger",canonicalId:"ginger"}]},
+  { name:"Spaghetti Bolognese", baseServings:6, ingredients:[
+    {qty:500,unit:"g",name:"beef mince",canonicalId:"beef-mince"},
+    {qty:500,unit:"g",name:"pasta",canonicalId:"pasta"},
+    {qty:800,unit:"g",name:"diced tomatoes",canonicalId:"tinned-tomatoes"},
+    {qty:1,unit:"each",name:"onion",canonicalId:"onion"},
+    {qty:2,unit:"clove",name:"garlic",canonicalId:"garlic"},
+    {qty:2,unit:"each",name:"carrot",canonicalId:"carrots"},
+    {qty:100,unit:"g",name:"cheddar",canonicalId:"cheddar"}]},
+  { name:"Chicken Burrito Bowl", baseServings:4, ingredients:[
+    {qty:500,unit:"g",name:"chicken breast",canonicalId:"chicken-breast"},
+    {qty:2,unit:"cup",name:"rice",canonicalId:"rice"},
+    {qty:400,unit:"g",name:"black beans",canonicalId:"black-beans"},
+    {qty:400,unit:"g",name:"corn kernels",canonicalId:"corn"},
+    {qty:1,unit:"each",name:"capsicum",canonicalId:"capsicum"},
+    {qty:1,unit:"each",name:"avocado",canonicalId:"avocado"},
+    {qty:1,unit:"each",name:"lime",canonicalId:"lime"},
+    {qty:100,unit:"g",name:"greek yoghurt",canonicalId:"yoghurt"},
+    {qty:100,unit:"g",name:"cheddar",canonicalId:"cheddar"}]},
+  { name:"Beef Fried Rice", baseServings:4, ingredients:[
+    {qty:500,unit:"g",name:"beef mince",canonicalId:"beef-mince"},
+    {qty:2,unit:"cup",name:"rice",canonicalId:"rice"},
+    {qty:500,unit:"g",name:"mixed frozen vegetables",canonicalId:"frozen-veg"},
+    {qty:3,unit:"tbsp",name:"soy sauce",canonicalId:"soy-sauce"},
+    {qty:4,unit:"each",name:"eggs",canonicalId:"eggs"},
+    {qty:1,unit:"each",name:"spring onions",canonicalId:"spring-onion"},
+    {qty:2,unit:"clove",name:"garlic",canonicalId:"garlic"}]},
+  { name:"Overnight Oats", baseServings:2, ingredients:[
+    {qty:200,unit:"g",name:"rolled oats",canonicalId:"oats"},
+    {qty:500,unit:"ml",name:"milk",canonicalId:"milk"},
+    {qty:100,unit:"g",name:"greek yoghurt",canonicalId:"yoghurt"},
+    {qty:20,unit:"g",name:"honey",canonicalId:"honey"},
+    {qty:100,unit:"g",name:"frozen berries",canonicalId:"frozen-berries"},
+    {qty:1,unit:"each",name:"banana",canonicalId:"banana"}]},
+  { name:"Greek Chicken Bowls", baseServings:4, ingredients:[
+    {qty:500,unit:"g",name:"chicken breast",canonicalId:"chicken-breast"},
+    {qty:1,unit:"each",name:"cucumber",canonicalId:"cucumber"},
+    {qty:200,unit:"g",name:"tomatoes",canonicalId:"tomato"},
+    {qty:100,unit:"g",name:"greek yoghurt",canonicalId:"yoghurt"},
+    {qty:1,unit:"each",name:"lemon",canonicalId:"lemon"},
+    {qty:2,unit:"clove",name:"garlic",canonicalId:"garlic"},
+    {qty:2,unit:"tbsp",name:"olive oil",canonicalId:"olive-oil"}]},
+  { name:"Salmon & Roast Veg", baseServings:4, ingredients:[
+    {qty:480,unit:"g",name:"salmon",canonicalId:"salmon"},
+    {qty:500,unit:"g",name:"sweet potato",canonicalId:"sweet-potato"},
+    {qty:1,unit:"each",name:"broccoli",canonicalId:"broccoli"},
+    {qty:1,unit:"each",name:"lemon",canonicalId:"lemon"},
+    {qty:2,unit:"tbsp",name:"olive oil",canonicalId:"olive-oil"}]},
+  { name:"Veggie Lentil Soup", baseServings:6, ingredients:[
+    {qty:375,unit:"g",name:"lentils",canonicalId:"lentils"},
+    {qty:2,unit:"each",name:"carrot",canonicalId:"carrots"},
+    {qty:1,unit:"each",name:"onion",canonicalId:"onion"},
+    {qty:400,unit:"g",name:"diced tomatoes",canonicalId:"tinned-tomatoes"},
+    {qty:2,unit:"each",name:"stock cubes",canonicalId:"stock"},
+    {qty:2,unit:"clove",name:"garlic",canonicalId:"garlic"}]},
+  { name:"Garlic Butter Chicken & Potatoes", baseServings:4, ingredients:[
+    {qty:500,unit:"g",name:"chicken thigh",canonicalId:"chicken-thigh"},
+    {qty:1,unit:"kg",name:"potatoes",canonicalId:"potato"},
+    {qty:2,unit:"each",name:"carrot",canonicalId:"carrots"},
+    {qty:4,unit:"clove",name:"garlic",canonicalId:"garlic"},
+    {qty:50,unit:"g",name:"butter",canonicalId:"butter"}]},
+  { name:"Egg & Veg Breakfast Muffins", baseServings:4, ingredients:[
+    {qty:6,unit:"each",name:"eggs",canonicalId:"eggs"},
+    {qty:60,unit:"g",name:"baby spinach",canonicalId:"spinach"},
+    {qty:1,unit:"each",name:"capsicum",canonicalId:"capsicum"},
+    {qty:100,unit:"g",name:"cheddar",canonicalId:"cheddar"},
+    {qty:100,unit:"ml",name:"milk",canonicalId:"milk"}]}
+];
+function sampleSeed(){ return SAMPLE_RECIPES.map(r => Object.assign({ id: uid() }, { name:r.name, baseServings:r.baseServings, ingredients: r.ingredients.map(i => Object.assign({}, i)) })); }
+function ensureSampleRecipes(){
+  if(!LS) return;
+  if(!LS.getItem("sa_samples_seeded")){
+    if(STATE.recipes.length === 0){ STATE.recipes = sampleSeed(); saveRecipes(); }
+    LS.setItem("sa_samples_seeded", "1");
+  }
+}
+function loadSampleRecipes(){
+  const existing = new Set(STATE.recipes.map(r => r.name.toLowerCase().trim()));
+  let added = 0;
+  SAMPLE_RECIPES.forEach(r => { if(!existing.has(r.name.toLowerCase().trim())){ STATE.recipes.push(Object.assign({ id: uid() }, { name:r.name, baseServings:r.baseServings, ingredients: r.ingredients.map(i => Object.assign({}, i)) })); added++; } });
+  saveRecipes();
+  return added;
+}
+
 /* ---------------- price feed (optional live refresh) ---------------- */
 let FEED_META = { generatedAt: null, status: null, source: "seed" };
+/* Parse an Aldi special's size from either the numeric {q,u} fields or the
+   legacy string "size" field ("1kg", "300g", "2L", "5 Pack"). */
+function feedSize(sp){
+  if(sp.q != null && sp.u) return { q: sp.q, u: sp.u };
+  const m = String(sp.size || "").match(/^([\d.]+)\s*(kg|g|ml|l|each|pack)$/i);
+  if(m){
+    let q = parseFloat(m[1]), u = m[2].toLowerCase();
+    if(u === "g"){ q = q / 1000; u = "kg"; }
+    if(u === "ml"){ q = q / 1000; u = "L"; }
+    if(u === "pack"){ u = "each"; }
+    return { q, u };
+  }
+  return { q: 1, u: "each" };
+}
 function applyFeed(feed){
   try{
     if(!feed || feed.status !== "ok") return;
     FEED_META.generatedAt = feed.generatedAt || null;
     FEED_META.status = feed.status;
     FEED_META.source = "feed";
+    FEED_META.stores = {};
     const st = feed.stores || {};
     if(st.coles && Array.isArray(st.coles.items)){
-      st.coles.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.coles){ c.coles.p = it.price ?? c.coles.p; c.coles.w = it.wasPrice ?? c.coles.w; c.coles.s = !!it.onSpecial; c.coles.promo = it.promo || c.coles.promo; } });
+      st.coles.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.coles && it.price != null){ c.coles.p = it.price; c.coles.w = it.wasPrice != null ? it.wasPrice : c.coles.w; c.coles.s = !!it.onSpecial; c.coles.promo = it.promo || c.coles.promo; } });
+      FEED_META.stores.coles = { source: st.coles.source || "scraped", stale: !!st.coles.stale };
     }
     if(st.woolworths && Array.isArray(st.woolworths.items)){
-      st.woolworths.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.wool){ c.wool.p = it.price ?? c.wool.p; c.wool.w = it.wasPrice ?? c.wool.w; c.wool.s = !!it.onSpecial; } });
+      st.woolworths.items.forEach(it => { const c = CAT_BY_ID[it.id]; if(c && c.wool && it.price != null){ c.wool.p = it.price; c.wool.w = it.wasPrice != null ? it.wasPrice : c.wool.w; c.wool.s = !!it.onSpecial; } });
+      FEED_META.stores.woolworths = { source: st.woolworths.source || "scraped", stale: !!st.woolworths.stale };
     }
     if(st.aldi && Array.isArray(st.aldi.specials)){
       CAT.forEach(c => c.aldiSpecial = null);
-      st.aldi.specials.forEach(sp => { const c = CAT_BY_ID[sp.id]; if(c) c.aldiSpecial = { price: sp.price, q: sp.q, u: sp.u, note: sp.note || "Special Buy", until: sp.until || null }; });
+      st.aldi.specials.forEach(sp => { const c = CAT_BY_ID[sp.id]; if(c){ const sz = feedSize(sp); c.aldiSpecial = { price: sp.price, q: sz.q, u: sz.u, note: sp.note || "Special Buy", until: sp.until || null }; } });
+      FEED_META.stores.aldi = { source: st.aldi.source || "specials-catalogue", stale: !!st.aldi.stale };
     }
   }catch(e){ /* ignore malformed feed */ }
 }
@@ -624,7 +1034,12 @@ const EACH_G = {  // typical grams per "each" for produce & tinned goods
   onion:150, tomato:120, potato:180, carrot:70, "sweet-potato":300, avocado:250,
   lemon:110, lime:70, apple:170, banana:120, orange:200, ginger:25, mushrooms:250,
   "tinned-tomatoes":400, chickpeas:400, "black-beans":400, "baked-beans":420,
-  corn:400, tuna:95, "tomato-paste":140, lentils:400, butter:250
+  corn:400, tuna:95, "tomato-paste":140, lentils:400, butter:250,
+  zucchini:300, eggplant:450, cauliflower:1000, cabbage:1200, celery:400,
+  beetroot:200, leek:150, "corn-cob":200, "bok-choy":250, asparagus:200,
+  silverbeet:250, radish:15, fennel:300, pumpkin:1500, kale:200,
+  "green-beans":250, "snow-peas":150, "brussels-sprouts":15, "bean-sprouts":250,
+  cucumber:400, broccoli:350, capsicum:180, lettuce:500, "spring-onion":60
 };
 const DENS_GML = {  // grams per mL for common volume→weight conversions
   rice:0.85, oats:0.36, flour:0.60, sugar:0.88, butter:0.96, "olive-oil":0.90,
@@ -633,7 +1048,23 @@ const DENS_GML = {  // grams per mL for common volume→weight conversions
   "peanut-butter":1.30, almonds:0.55, yoghurt:1.03, cream:1.00, milk:1.03,
   "almond-milk":1.00, "orange-juice":1.05, "soy-sauce":1.20, mushrooms:0.40,
   "frozen-berries":0.70, "frozen-peas":0.70, "frozen-veg":0.70, "pasta-sauce":1.05,
-  "tomato-paste":1.20
+  "tomato-paste":1.20,
+  quinoa:0.90, couscous:0.75, "brown-rice":0.90, "arborio-rice":0.90,
+  "rice-noodles":0.30, "egg-noodles":0.40, "split-peas":0.80, "mixed-beans":0.80,
+  passata:1.05, "coconut-milk":1.00, "white-vinegar":1.00, "apple-cider-vinegar":1.00,
+  "balsamic-vinegar":1.05, mustard:1.00, mayonnaise:0.95, "tomato-sauce":1.05,
+  "bbq-sauce":1.05, "sweet-chilli":1.05, sriracha:1.05, "fish-sauce":1.10,
+  "oyster-sauce":1.15, worcestershire:1.10, "sesame-oil":0.92, "canola-oil":0.92,
+  "brown-sugar":0.90, "icing-sugar":0.55, "golden-syrup":1.40, "maple-syrup":1.33,
+  "vanilla-extract":0.90, "cocoa-powder":0.40, "baking-powder":0.90, "bicarb-soda":0.90,
+  cornflour:0.55, breadcrumbs:0.50, "curry-powder":0.50, turmeric:0.50,
+  "chilli-flakes":0.30, cinnamon:0.50, nutmeg:0.40, oregano:0.25, "mixed-herbs":0.30,
+  "dark-chocolate":0.80, "tortilla-chips":0.30, crackers:0.50, popcorn:0.80,
+  jam:1.40, "veg-emite":1.20, "sour-cream":1.00, "cream-cheese":1.00, custard:1.05,
+  "ice-cream":0.55, buttermilk:1.03, "condensed-milk":1.30, "frozen-spinach":0.70,
+  "frozen-corn":0.70, "frozen-broccoli":0.70, "cauliflower-rice":0.60,
+  "sparkling-water":1.00, lemonade:1.05, cordial:1.20, "coconut-water":1.00,
+  kombucha:1.00, "dish-liquid":1.00, "laundry-liquid":1.00
 };
 function convertToKind(amount, fromKind, toKind, id){
   if(fromKind === toKind) return amount;
@@ -654,8 +1085,30 @@ function convertToKind(amount, fromKind, toKind, id){
 
 /* ---------------- free-text parser ---------------- */
 const STOPWORDS = new Set(["of","fresh","frozen","raw","cooked","sliced","diced","chopped","minced","whole","large","small","medium","approx","about","some","a","an","the","and","with","plus","optional","to","taste"]);
+/* Words that describe prep instructions rather than an ingredient. A comma
+   fragment made ONLY of these (e.g. "diced", "finely chopped", "to taste",
+   "for garnish") is dropped instead of becoming a manual item. */
+const PREP_MODIFIERS = new Set(["diced","grated","sliced","chopped","minced","shredded","finely","roughly","coarsely","thinly","cubed","julienned","crushed","zested","juiced","peeled","halved","quartered","ground","washed","trimmed","divided","optional","extra","plus","to","taste","for","garnish","garnishing","serving","serve","serves","needed","as","room","temperature","sauce","dressing","marinade","topping","salsa","method","directions","instructions","ingredients","prep","cook","time","total","yield","makes","fresh","large","small","medium","approx","about","some","the","and","of","with","a","an"]);
+/* Colour/size/form descriptors that may prefix an ingredient ("brown onion",
+   "red capsicum"). Used to decide whether leftover words around a matched
+   item are legit qualifiers or the mark of an instruction sentence. */
+const DESCRIPTORS = new Set(["brown","red","white","green","yellow","black","blue","purple","pink","orange","baby","loose","washed","trimmed","premium","free","range","organic","dried","tinned","canned","frozen","wild","instant","quick","sweet","selection","quality","desired","long","short","grain","ground"]);
+/* Recipe-instruction verbs — a no-quantity line starting with one of these is
+   a direction ("Cook the rice."), not an ingredient. */
+const VERBS = new Set(["cook","stir","fry","add","mix","heat","bake","boil","simmer","serve","set","aside","preheat","place","combine","whisk","beat","melt","pour","season","chop","slice","grate","dice","crush","peel","cut","wash","drain","rinse","bring","reduce","remove","transfer","cover","uncover","stand","rest","chill","refrigerate","marinate","reserve","spread","sprinkle","toss","warm","prepare","prep"]);
+/* Harmless words allowed around a matched item name. Deliberately excludes
+   PREP_MODIFIERS' heading/verb words ("cook", "serve", "time"…) so that
+   instruction sentences never false-match an ingredient. */
+const RESIDUAL_OK = new Set([...STOPWORDS, ...DESCRIPTORS, "garnish", "garnishing"]);
 function normalizeName(s){
   return s.toLowerCase().replace(/[^a-z0-9\s-]/g," ").replace(/\s+/g," ").trim();
+}
+function residualOk(full, alias){
+  const idx = full.indexOf(alias);
+  if(idx === -1) return true;
+  const before = full.slice(0, idx).split(" ").filter(Boolean);
+  const after = full.slice(idx + alias.length).split(" ").filter(Boolean);
+  return before.concat(after).every(w => RESIDUAL_OK.has(w));
 }
 function matchCanonical(nameRaw){
   const n = normalizeName(nameRaw);
@@ -666,21 +1119,67 @@ function matchCanonical(nameRaw){
     for(const a of c.aliases){
       const an = normalizeName(a);
       if(an === n) return c.id;
-      if(n.includes(an) && an.length >= 3){ const sc = an.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
-      else if(an.includes(n) && n.length >= 4){ const sc = n.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
+      // containment matches only count when the leftover words are harmless
+      // qualifiers (e.g. "brown onion" → onion) — so "cook the rice" and
+      // bare "diced" don't false-match.
+      if(n.includes(an) && an.length >= 3 && residualOk(n, an)){ const sc = an.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
+      else if(an.includes(n) && n.length >= 4 && residualOk(an, n)){ const sc = n.length; if(sc>bestScore){bestScore=sc; best=c.id;} }
     }
   }
   if(best) return best;
-  // token overlap fallback
+  // token overlap fallback — unmatched words must be qualifiers only
   let bestTok=null, bestOverlap=0;
   for(const c of CAT){
     for(const a of c.aliases){
       const at = normalizeName(a).split(" ").filter(t=>t&&!STOPWORDS.has(t));
-      const overlap = tokens.filter(t => at.includes(t)).length;
-      if(overlap > bestOverlap){ bestOverlap = overlap; bestTok = c.id; }
+      const matched = tokens.filter(t => at.includes(t));
+      const unmatched = tokens.filter(t => !at.includes(t));
+      if(matched.length > bestOverlap && unmatched.every(t => RESIDUAL_OK.has(t))){
+        bestOverlap = matched.length; bestTok = c.id;
+      }
     }
   }
   return (bestOverlap >= 1 && tokens.length <= 2) ? bestTok : (bestTok && bestOverlap >= 2 ? bestTok : null);
+}
+function stripMarkers(s){
+  let t = (s||"").replace(/^\uFEFF/, "");
+  // checkboxes / check & cross marks / bullet glyphs
+  t = t.replace(/^[\s]*[☐☑☒▢○●◦‣•▪∙✓✔✗✘✕✖]\s*/, "");
+  // typed bullets: "- " "– " "— " "* "
+  t = t.replace(/^[\s]*[-–—*·]\s+(?=\S)/, "");
+  // "Step 1:" / "Step 1."
+  t = t.replace(/^[\s]*step\s*\d{1,2}\s*[.:)]\s*/i, "");
+  // numbered lists: "1. " (dot requires whitespace so "1.5 cups" is safe)
+  t = t.replace(/^[\s]*\d{1,2}\.\s+/, "");
+  // "2)" or "3:"
+  t = t.replace(/^[\s]*\d{1,2}[):]\s*/, "");
+  return t.trim();
+}
+function isHeadingLine(s){
+  const t = (s||"").trim();
+  if(/^(ingredients?|method|directions?|instructions?|equipment|notes?|tips?|nutrition|prep time|cook time|total time|yield|shopping list|steps?)[\s:.\-)]*$/i.test(t)) return true;
+  if(/^(for the|to serve|to garnish|to taste|serves?|servings?|makes?|yield)(\s|:|$)/i.test(t) && !/\b(g|kg|ml|l|cup|tbsp|tsp)\b/i.test(t)) return true;
+  return false;
+}
+function isPureModifier(s){
+  const t = normalizeName(s);
+  if(!t) return true;
+  const words = t.split(" ").filter(Boolean);
+  if(words.every(w => PREP_MODIFIERS.has(w))) return true;
+  return false;
+}
+function looksLikeIngredient(s){
+  if(isPureModifier(s)) return false;
+  if(/^\d/.test((s||"").trim())) return true;   // starts with a quantity
+  return matchCanonical(s) !== null;
+}
+function splitAnd(s){
+  if(/\d/.test(s)) return [s];                    // a quantity applies to the whole phrase
+  const m = s.match(/^(.+?)\s+and\s+(.+)$/i);
+  if(!m) return [s];
+  const l = m[1].trim(), r = m[2].trim();
+  if(l && r && matchCanonical(l) && matchCanonical(r)) return [l, r];
+  return [s];
 }
 function parseLine(line){
   line = (line||"").trim();
@@ -689,7 +1188,7 @@ function parseLine(line){
   // "2 x 400g chicken" style
   const xm = line.match(/^(\d+(?:\.\d+)?)\s*x\s+(.+)$/i);
   if(xm){ outerQty = parseFloat(xm[1]); line = xm[2]; }
-  const m = line.match(/^(\d+(?:\.\d+)?)\s*(kg|kilos?|g|grams?|ml|mls|l|litres?|liters?|cups?|tbsp|tablespoons?|tsp|teaspoons?|x|each|head|bunch|can|tin|pack|packet|cloves?|slices?)\s*(?:of\s+)?(.+)$/i);
+  const m = line.match(/^(\d+(?:\.\d+)?)\s*(kg|kilos?|g|grams?|ml|mls|l|litres?|liters?|cups?|tbsp|tablespoons?|tsp|teaspoons?|x|each|head|bunch|can|tin|pack|packet|cloves?|slices?)(?![a-z0-9])\s*(?:of\s+)?(.+)$/i);
   if(m){
     qty = parseFloat(m[1]);
     unit = m[2].toLowerCase();
@@ -705,14 +1204,41 @@ function parseLine(line){
     if(m2){ qty = parseFloat(m2[1]); name = m2[2].trim(); }
   }
   if(outerQty !== null) qty = qty * outerQty;
+  // strip trailing serving notes so the display name stays clean
+  name = name.replace(/\s+(to taste|to serve|to garnish|for garnish|for serving|optional)$/i, "").trim();
   const canonicalId = matchCanonical(name);
   return { raw: line, qty: qtyNum(qty), unit: unit, name: name, canonicalId: canonicalId };
 }
 function parseFreeText(text){
   const out = [];
-  (text||"").split(/[\n,;]+/).forEach(line => {
-    const r = parseLine(line);
-    if(r) out.push(r);
+  (text||"").split(/\r?\n|;/).forEach(raw => {
+    const line = stripMarkers(raw);
+    if(!line) return;
+    if(isHeadingLine(line)) return;
+    // Comma fragments: first is the ingredient; later fragments are kept only
+    // if they look like another ingredient (start with a qty / match a known
+    // item) — otherwise they're prep notes ("diced", "to taste") and dropped.
+    line.split(",").forEach((seg, i) => {
+      const s = seg.trim();
+      if(!s) return;
+      if(i === 0){
+        // "salt and pepper" → two items (only when both halves are known)
+        const parts = splitAnd(s);
+        if(parts.length > 1){ parts.forEach(p => { const r = parseLine(p); if(r) out.push(r); }); return; }
+        if(!/\d/.test(s)){
+          // no quantity: drop pure modifiers, titles and instruction sentences
+          if(isPureModifier(s)) return;
+          const canon = matchCanonical(s);
+          const words = normalizeName(s).split(" ").filter(Boolean);
+          if(words.length === 0) return;
+          if(canon === null && words.length > 2) return;      // "Chicken Stir Fry"
+          if(canon === null && VERBS.has(words[0])) return;   // "Cook the rice"
+        }
+        const r = parseLine(s); if(r) out.push(r);
+      } else if(looksLikeIngredient(s)){
+        const r = parseLine(s); if(r) out.push(r);
+      }
+    });
   });
   return out;
 }
@@ -946,7 +1472,9 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
             <div class="onboard-step"><span class="n">2</span><div><b>Plan your week</b><div class="muted">Assign meals to days.</div></div></div>
             <div class="onboard-step"><span class="n">3</span><div><b>See your list</b><div class="muted">Auto-split to the cheapest stores.</div></div></div>
           </div>
-          <button class="btn primary" data-action="goto-recipes">Add your first recipe</button>
+          <button class="btn primary" data-action="load-samples">Load 10 sample recipes</button>
+          <div style="height:9px"></div>
+          <button class="btn soft" data-action="goto-recipes">Add your own recipe</button>
         </div>`;
       return;
     }
@@ -1120,7 +1648,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   /* ---------- RECIPES ---------- */
   function renderRecipes(){
     if(STATE.recipes.length === 0){
-      $("recipeList").innerHTML = `<div class="empty" style="padding:16px 6px"><span class="fx">🍳</span><b>No recipes yet</b><p class="muted">Paste one above, or tap + New.</p></div>`;
+      $("recipeList").innerHTML = `<div class="empty" style="padding:16px 6px"><span class="fx">🍳</span><b>No recipes yet</b><p class="muted">Paste one above, or tap + New.</p><button class="btn primary" data-action="load-samples" style="margin-top:10px">Load 10 sample recipes</button></div>`;
     }else{
       $("recipeList").innerHTML = STATE.recipes.map(r => `
         <div class="recipe" data-action="edit-recipe" data-id="${r.id}">
@@ -1264,9 +1792,17 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     $("maxStores").value = String(STATE.settings.maxStores);
     applyTheme();
     const f = FEED_META;
-    $("priceFreshness").textContent = f.generatedAt
-      ? "Prices refreshed " + new Date(f.generatedAt).toLocaleString() + " via the price feed."
-      : "Using built-in seed prices. Once the GitHub price feed is live, prices refresh automatically.";
+    const label = { coles:"Coles", woolworths:"Woolworths", aldi:"Aldi" };
+    let parts = [];
+    if(f.stores){
+      Object.keys(label).forEach(s => {
+        const st = f.stores[s];
+        if(st) parts.push(label[s] + (st.stale ? " · last known" : " · live"));
+      });
+    }
+    $("priceFreshness").innerHTML =
+      (f.generatedAt ? "Prices refreshed " + new Date(f.generatedAt).toLocaleString() + "<br>" : "") +
+      (parts.length ? parts.join(" · ") : "Using built-in seed prices — once the price feed is live it refreshes automatically.");
   }
 
   /* ---------- modal ---------- */
@@ -1276,6 +1812,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   function onAction(action, node){
     switch(action){
       case "goto-recipes": showTab("recipes"); break;
+      case "load-samples": { const added = loadSampleRecipes(); toast(added > 0 ? "Loaded " + added + " sample recipes 🎉" : "Sample recipes already loaded"); renderHome(); renderRecipes(); break; }
       case "goto-plan": showTab("plan"); break;
       case "goto-specials": showTab("specials"); break;
       case "goto-more": showTab("more"); break;
@@ -1369,6 +1906,11 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       renderRecipes();
     });
     $("newRecipeBtn").addEventListener("click", () => openRecipeEditor(null));
+    $("sampleBtn").addEventListener("click", () => {
+      const added = loadSampleRecipes();
+      toast(added > 0 ? "Loaded " + added + " sample recipes 🎉" : "Sample recipes already loaded");
+      renderRecipes();
+    });
     $("splitSlider").addEventListener("input", ev => {
       STATE.settings.splitPref = parseInt(ev.target.value,10)/100; saveSettings();
     });
@@ -1412,6 +1954,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
 
   function init(){
     seedAldi();
+    ensureSampleRecipes();
     applyTheme();
     wire();
     showTab("home");
