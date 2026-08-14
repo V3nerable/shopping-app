@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-14T08:01:00.510Z",
+  "generatedAt": "2026-08-14T08:50:16.938Z",
   "status": "ok",
   "currency": "AUD",
   "stores": {
@@ -3124,7 +3124,7 @@
     },
     "aldi": {
       "source": "specials-catalogue",
-      "asOf": "2026-08-14T08:02:27.213Z",
+      "asOf": "2026-08-14T08:52:55.759Z",
       "specials": [
         {
           "id": "mayonnaise",
