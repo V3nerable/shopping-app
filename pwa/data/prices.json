@@ -1,8 +1,7 @@
 {
-  "generatedAt": "2026-08-13T03:00:00+08:00",
+  "generatedAt": "2026-08-14T05:55:26.953Z",
   "status": "ok",
   "currency": "AUD",
-  "note": "Seed feed generated from the built-in catalogue. The home-device scraper (device-scraper/) or the GitHub Action replaces this with live prices.",
   "stores": {
     "coles": {
       "source": "seed",
@@ -1664,7 +1663,8 @@
           "onSpecial": false,
           "promo": null
         }
-      ]
+      ],
+      "stale": true
     },
     "woolworths": {
       "source": "seed",
@@ -3119,101 +3119,48 @@
           "wasPrice": 3,
           "onSpecial": false
         }
-      ]
+      ],
+      "stale": true
     },
     "aldi": {
       "source": "specials-catalogue",
-      "asOf": "2026-08-13T03:00:00+08:00",
+      "asOf": "2026-08-14T05:56:25.753Z",
       "specials": [
         {
-          "id": "eggs",
-          "name": "Eggs",
-          "price": 3.99,
-          "q": 12,
-          "u": "each",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "milk",
-          "name": "Milk",
-          "price": 2.79,
-          "q": 2,
-          "u": "L",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "butter",
-          "name": "Butter",
-          "price": 2.49,
-          "q": 0.25,
+          "id": "mayonnaise",
+          "name": "Original Mayonnaise 300g",
+          "price": 4.79,
+          "q": 0.3,
           "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
+          "note": "Special Buy",
+          "until": "2026-08-19"
         },
         {
-          "id": "cheddar",
-          "name": "Cheddar Cheese",
-          "price": 4.99,
-          "q": 0.5,
-          "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "coffee",
-          "name": "Instant Coffee",
-          "price": 6.99,
-          "q": 0.2,
-          "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "olive-oil",
-          "name": "Olive Oil",
-          "price": 8.99,
-          "q": 0.75,
-          "u": "L",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "frozen-berries",
-          "name": "Frozen Mixed Berries",
-          "price": 4.49,
-          "q": 0.5,
-          "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "pasta",
-          "name": "Pasta",
-          "price": 0.99,
-          "q": 0.5,
-          "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
-        },
-        {
-          "id": "tomato",
-          "name": "Tomatoes",
-          "price": 2.99,
+          "id": "sausages",
+          "name": "Italian Style Pork & Beef Sausages 1kg",
+          "price": 13.99,
           "q": 1,
           "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
+          "note": "Special Buy",
+          "until": "2026-08-19"
         },
         {
-          "id": "banana",
-          "name": "Bananas",
-          "price": 1.99,
-          "q": 1,
+          "id": "rice",
+          "name": "Jasmine Rice 5kg",
+          "price": 11.99,
+          "q": 5,
           "u": "kg",
-          "until": "2026-08-19",
-          "note": "Special Buy"
+          "note": "Special Buy",
+          "until": "2026-08-19"
+        },
+        {
+          "id": "sesame-oil",
+          "name": "Sesame Oil 150ml",
+          "price": 3.49,
+          "q": 0.15,
+          "u": "L",
+          "note": "Special Buy",
+          "until": "2026-08-19"
         }
       ]
     }
