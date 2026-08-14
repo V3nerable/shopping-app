@@ -112,9 +112,28 @@ On every deploy command, bump the version by **exactly 0.01** in ALL of:
 2. `manifest.webmanifest` (`"version"`).
 3. `sw.js` (`const VERSION`).
 4. The master zip name: `Shopping-App-v0.XX.zip`.
+5. `scraper/package.json` (`"version"`) and `device-scraper/package.json`
+   (`"version"`) — keep them aligned as `0.X.0` matching the app's minor
+   (e.g. app v0.08 → `"0.8.0"` in both).
 Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
+
+### v0.08 — 2026-08-14 (version alignment)
+- Aligned the two scraper package versions with the app release number:
+  `scraper/package.json` 0.1.0 → 0.8.0 and `device-scraper/package.json`
+  0.4.0 → 0.8.0, so every file in the project now carries the same version.
+- Updated §6 (Versioning rule) to include both package.json files so future
+  bumps touch everything in one pass.
+- App version → v0.08 (no functional changes).
+
+### v0.07 — 2026-08-14 (device-scraper: mount-safe repo clear)
+- Fixed "Error: Device or resource busy '/repo'": `/repo` is a Docker named
+  volume (a mount point), so `rmSync(REPO_DIR)` fails. Replaced with a
+  `clearDir()` helper that empties the directory's CONTENTS (readdirSync +
+  per-entry rmSync) without deleting the mount point itself, leaving a clean
+  target for `git clone`. Added `readdirSync` import.
+- Version → v0.07.
 
 ### v0.06 — 2026-08-14 (device-scraper bugfixes)
 - Playwright pinned to 1.62.1 in BOTH `device-scraper/Dockerfile`

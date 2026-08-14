@@ -26,7 +26,7 @@
  * marks the store stale and I patch it in a version bump.
  */
 import { chromium } from "playwright";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync } from "fs";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -65,6 +65,17 @@ function run(cmd, opts = {}) {
     const err = new Error(redact(e.message || String(e)));
     err.status = e.status;
     throw err;
+  }
+}
+
+/* Empty a directory's CONTENTS without deleting the directory itself. This is
+   what makes /repo safe to clean: /repo is a Docker mount point, so deleting
+   the folder fails with "Device or resource busy" — deleting its children is
+   fine and leaves a clean, empty target for git clone. */
+function clearDir(dir) {
+  if (!existsSync(dir)) return;
+  for (const entry of readdirSync(dir)) {
+    rmSync(path.join(dir, entry), { recursive: true, force: true });
   }
 }
 
@@ -215,9 +226,10 @@ function ensureRepo() {
     try { run(`git -C ${REPO_DIR} pull --ff-only`); }
     catch (e) { log("git pull failed (continuing):", redact(e.message)); }
   } else {
-    // Wipe any leftover non-git directory (e.g. a previous partial run) so the
-    // clone has a clean, empty target.
-    if (existsSync(REPO_DIR)) { log("clearing stale", REPO_DIR); rmSync(REPO_DIR, { recursive: true, force: true }); }
+    // Wipe any leftover non-git contents (e.g. a previous partial run) so the
+    // clone has a clean, empty target. clearDir empties the mount point's
+    // CONTENTS rather than deleting the mount point itself.
+    if (existsSync(REPO_DIR)) { log("clearing stale /repo contents"); clearDir(REPO_DIR); }
     mkdirSync(REPO_DIR, { recursive: true });
     log("cloning repo…");
     run(`git clone --depth 1 ${cloneUrl} ${REPO_DIR}`);

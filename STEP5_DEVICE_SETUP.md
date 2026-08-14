@@ -1,6 +1,6 @@
-# Step 5 — Update the Mini PC & start the price feeder (v0.06)
+# Step 5 — Update the Mini PC & start the price feeder (v0.08)
 
-Goal: get the **full** v0.06 project onto the Mini PC, configure one secret,
+Goal: get the **full** v0.08 project onto the Mini PC, configure one secret,
 start the Docker container, and confirm it's pushing prices.
 
 Do the checkpoints in order. Each has a "✓ looks like this worked" line.
@@ -20,24 +20,24 @@ Do the checkpoints in order. Each has a "✓ looks like this worked" line.
 
 ---
 
-## Checkpoint 1 — Get the full v0.06 onto the PC
+## Checkpoint 1 — Get the full v0.08 onto the PC
 
 GitHub still holds the **incomplete** project (that's why `device-scraper`
 was missing), so don't trust `git pull` yet — use the zip.
 
-1. On the Mini PC, download **`Shopping-App-v0.06.zip`** from the workspace
+1. On the Mini PC, download **`Shopping-App-v0.08.zip`** from the workspace
    viewer (it lands in **Downloads**).
 2. Open **PowerShell** and find where it went:
    ```powershell
    cd C:\Users\beaum
-   Get-ChildItem -Path . -Recurse -Filter "Shopping-App-v0.06.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+   Get-ChildItem -Path . -Recurse -Filter "Shopping-App-v0.08.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
    ```
-   ✓ It prints a path like `C:\Users\beaum\Downloads\Shopping-App-v0.06.zip`.
+   ✓ It prints a path like `C:\Users\beaum\Downloads\Shopping-App-v0.08.zip`.
    If nothing prints, download the zip first.
 
 3. Extract it straight into the repo folder:
    ```powershell
-   Expand-Archive -Path "$env:USERPROFILE\Downloads\Shopping-App-v0.06.zip" -DestinationPath C:\Users\beaum\shopping-app -Force
+   Expand-Archive -Path "$env:USERPROFILE\Downloads\Shopping-App-v0.08.zip" -DestinationPath C:\Users\beaum\shopping-app -Force
    ```
    *(If the zip is on your Desktop, swap `Downloads` for `Desktop`.)*
 
@@ -59,7 +59,7 @@ cd C:\Users\beaum\shopping-app
 git config --global user.name "v3nerable"
 git config --global user.email "your-github-email@example.com"
 git add .
-git commit -m "Shopping App v0.06 full project"
+git commit -m "Shopping App v0.08 full project"
 git push
 ```
 
@@ -117,6 +117,29 @@ GH_REPO=v3nerable/shopping-app
 
 ## Checkpoint 5 — Build and start the container
 
+### 5a. Manually clear the stale folders FIRST (v0.07+)
+
+If you've run the feeder before (an older version crashed), clear the old
+volumes so the clone starts from a clean slate:
+
+```powershell
+docker compose down -v
+```
+
+- `down` stops and removes the container.
+- `-v` also deletes the two named volumes (`device-scraper_repo` and
+  `device-scraper_profile`) that hold the old `/repo` and browser profile.
+- ✓ It should print lines like `Removing network …`, `Removing volume
+  device-scraper_repo`, `Removing volume device-scraper_profile`.
+- If `down -v` can't find the volumes, that's fine — it just means they were
+  never created; carry on.
+
+> Note: from v0.07 the scraper also clears `/repo`'s *contents* automatically,
+> so this manual step is belt-and-braces, not strictly required. It's still the
+> cleanest way to recover from an older version that crash-looped.
+
+### 5b. Build and start
+
 ```powershell
 docker compose up -d --build
 ```
@@ -156,6 +179,7 @@ Press **Ctrl+C** to stop *watching* the logs — the container keeps running.
 | `aldi: ok — N specials` | Aldi specials (known to work) ✔ |
 | `coles: no results — page structure may have changed` | Store redesigned a page — app keeps working ("last known"); **paste me this log and I'll patch the selectors** |
 | `Authentication failed` on push | PAT scope wrong → must be **Contents: Read & write** on this repo |
+| `Device or resource busy '/repo'` | Old (pre-v0.07) image still running → run `docker compose down -v` (Checkpoint 5a), rebuild, and start again |
 
 ---
 
