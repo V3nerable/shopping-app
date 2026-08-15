@@ -1,5 +1,5 @@
 /**
- * Shopping App — home-device price feeder (v0.25)
+ * Shopping App — home-device price feeder (v0.26)
  * ================================================================
  * Runs on an always-on device on your RESIDENTIAL IP, so it sails past the
  * bot walls (Akamai / Incapsula) that block datacenter IPs. A real Chromium
@@ -191,15 +191,11 @@ async function scrapeAldi() {
     let html;
     try { html = await fetchText(`https://www.aldi.com.au/special-buys/${d}`); }
     catch (e) { log("aldi wave", d, "failed:", e.message); continue; }
-    for (const part of html.split('product-tile__name').slice(1)) {
-      const nm = part.match(/<p aria-label="([^"]*),?"/);
-      const name = nm ? nm[1].replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").trim().replace(/,$/, "") : null;
-      const pr = part.match(/base-price__regular"><span>\$([\d.]+)/);
-      if (!name || !pr) continue;
-      const id = matchCatalogue(name);
+    for (const tile of extractAldiTiles(html)) {
+      const id = matchCatalogue(tile.name);
       if (id && !byId.has(id)) {
-        const { q, u } = parseSize(name);
-        byId.set(id, { id, name, price: parseFloat(pr[1]), q, u, note: "Special Buy", until: d });
+        const { q, u } = parseSize(tile.name);
+        byId.set(id, { id, name: tile.name, price: tile.price, q, u, note: "Special Buy", until: d });
       }
     }
     await new Promise(r => setTimeout(r, 300));
@@ -209,35 +205,53 @@ async function scrapeAldi() {
   return specials;
 }
 
-/* Aldi FULL-LINE prices (v0.24): aldi.com.au/products SSR's everyday products
-   (name + $price in the rendered HTML, reachable from any IP — no bot wall).
-   Extracts product tiles, matches them to the catalogue, keeps cheapest per
-   item. These become "Everyday price" entries (the app compares them like a
-   normal store rather than flagging them as specials). */
-async function scrapeAldiFullLine() {
-  const html = await fetchText("https://www.aldi.com.au/products");
+/* Shared Aldi tile extractor: splits SSR'd HTML on product-tile__name and
+   reads the name + regular price from each product tile. Works for both the
+   /products catalogue pages and the /special-buys/{date} pages. */
+function extractAldiTiles(html) {
   const tiles = [];
-  for (const part of html.split('product-tile__name').slice(1)) {
+  for (const part of String(html).split('product-tile__name').slice(1)) {
     const nm = part.match(/<p aria-label="([^"]*),?"/);
     const name = nm ? nm[1].replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").trim().replace(/,$/, "") : null;
     const pr = part.match(/base-price__regular"><span>\$([\d.]+)/);
     if (!name || !pr) continue;
     tiles.push({ name, price: parseFloat(pr[1]) });
   }
-  if (tiles.length === 0) throw new Error("aldi: /products yielded no tiles (structure changed?)");
+  return tiles;
+}
 
+/* Aldi FULL-LINE prices (v0.26): aldi.com.au/products SSR's the ENTIRE
+   catalogue across ~110 pages (30 products per page, reachable from any IP —
+   no bot wall). Walks /products?page=1..N until a page comes back empty,
+   matches every tile to our catalogue, keeps the cheapest pack per item.
+   These become "Everyday price" entries (the app compares them like a normal
+   store rather than flagging them as specials). */
+async function scrapeAldiFullLine() {
+  const maxPages = QUICK ? 2 : Number(process.env.ALDI_MAX_PAGES || 250);
   const seen = new Map();
-  for (const t of tiles) {
-    const id = matchCatalogue(t.name);
-    if (!id) continue;
-    const { q, u } = parseSize(t.name);
-    const prev = seen.get(id);
-    const entry = { id, name: t.name, price: t.price, q, u, note: "Everyday price", until: null };
-    if (!prev || entry.price < prev.price) seen.set(id, entry);
+  let totalProducts = 0, pagesRead = 0;
+  for (let p = 1; p <= maxPages; p++) {
+    let html;
+    try { html = await fetchText(`https://www.aldi.com.au/products?page=${p}`); }
+    catch (e) { log("aldi full-line page", p, "failed —", e.message); break; }
+    const tiles = extractAldiTiles(html);
+    if (tiles.length === 0) break;
+    pagesRead = p;
+    totalProducts += tiles.length;
+    for (const t of tiles) {
+      const id = matchCatalogue(t.name);
+      if (!id) continue;
+      const { q, u } = parseSize(t.name);
+      const prev = seen.get(id);
+      const entry = { id, name: t.name, price: t.price, q, u, note: "Everyday price", until: null };
+      if (!prev || entry.price < prev.price) seen.set(id, entry);
+    }
+    if (p % 20 === 0) log("aldi full-line: page", p, "| products:", totalProducts, "| matched:", seen.size);
+    await new Promise(r => setTimeout(r, 300));
   }
   const items = [...seen.values()];
-  if (items.length === 0) throw new Error("aldi: /products matched nothing in the catalogue");
-  log("aldi full-line: matched", items.length, "items:", items.slice(0, 15).map(i => `${i.id} @ $${i.price}`).join(", "), items.length > 15 ? "…" : "");
+  if (items.length === 0) throw new Error("aldi: full-line matched nothing in the catalogue");
+  log("aldi full-line: walked", pagesRead, "pages /", totalProducts, "products ->", items.length, "catalogue matches:", items.slice(0, 15).map(i => `${i.id} @ $${i.price}`).join(", "), items.length > 15 ? "…" : "");
   return items;
 }
 

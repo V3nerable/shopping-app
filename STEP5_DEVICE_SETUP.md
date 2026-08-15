@@ -1,6 +1,6 @@
-# Step 5 — Update the Mini PC & start the price feeder (v0.25)
+# Step 5 — Update the Mini PC & start the price feeder (v0.26)
 
-Goal: get the **full** v0.25 project onto the Mini PC, configure one secret,
+Goal: get the **full** v0.26 project onto the Mini PC, configure one secret,
 start the Docker container, and confirm it's pushing prices.
 
 Do the checkpoints in order. Each has a "✓ looks like this worked" line.
@@ -20,24 +20,24 @@ Do the checkpoints in order. Each has a "✓ looks like this worked" line.
 
 ---
 
-## Checkpoint 1 — Get the full v0.25 onto the PC
+## Checkpoint 1 — Get the full v0.26 onto the PC
 
 GitHub still holds the **incomplete** project (that's why `device-scraper`
 was missing), so don't trust `git pull` yet — use the zip.
 
-1. On the Mini PC, download **`Shopping-App-v0.25.zip`** from the workspace
+1. On the Mini PC, download **`Shopping-App-v0.26.zip`** from the workspace
    viewer (it lands in **Downloads**).
 2. Open **PowerShell** and find where it went:
    ```powershell
    cd C:\Users\beaum
-   Get-ChildItem -Path . -Recurse -Filter "Shopping-App-v0.25.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+   Get-ChildItem -Path . -Recurse -Filter "Shopping-App-v0.26.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
    ```
-   ✓ It prints a path like `C:\Users\beaum\Downloads\Shopping-App-v0.25.zip`.
+   ✓ It prints a path like `C:\Users\beaum\Downloads\Shopping-App-v0.26.zip`.
    If nothing prints, download the zip first.
 
 3. Extract it straight into the repo folder:
    ```powershell
-   Expand-Archive -Path "$env:USERPROFILE\Downloads\Shopping-App-v0.25.zip" -DestinationPath C:\Users\beaum\shopping-app -Force
+   Expand-Archive -Path "$env:USERPROFILE\Downloads\Shopping-App-v0.26.zip" -DestinationPath C:\Users\beaum\shopping-app -Force
    ```
    *(If the zip is on your Desktop, swap `Downloads` for `Desktop`.)*
 
@@ -59,7 +59,7 @@ cd C:\Users\beaum\shopping-app
 git config --global user.name "v3nerable"
 git config --global user.email "your-github-email@example.com"
 git add .
-git commit -m "Shopping App v0.25 full project"
+git commit -m "Shopping App v0.26 full project"
 git push
 ```
 

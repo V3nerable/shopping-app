@@ -119,6 +119,25 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.26 — 2026-08-15 (Aldi full-site scrape + Specials columns/filters)
+- Aldi full-line scrape expanded to the WHOLE catalogue: `extractAldiTiles()`
+  shared helper (also used by the specials scraper), and `scrapeAldiFullLine()`
+  now walks `aldi.com.au/products?page=1..N` (SSR'd, ~30 products/page, ~110
+  pages) until empty — `ALDI_MAX_PAGES` env (default 250, QUICK=2). Verified:
+  4 pages → 120 products → 9 catalogue matches (Jasmine Rice $2.99, Diced
+  Tomatoes $0.95, Dark Chocolate $4.49, Smoked Salmon $9.99, Brown Rice $2.49…).
+- Specials screen rebuilt:
+  - `buildAllSpecials()` — unified list of every item on special at an enabled
+    store (Coles/Woolworths was-price, Aldi Special Buy), with `savePct` and
+    `saveDol` computed; each entry tagged `inList` if it's in the current plan.
+  - Store filter chips (All/Coles/Woolworths/Aldi) + saving filter chips
+    (Any/10%+/25%+/50%+), module state `specialStore` / `specialSave`, wired
+    via `data-action="special-filter-store|save"`.
+  - Column layout: `.sp-head`/`.sp-row` CSS grid (Item | Store | Now·Save),
+    strikethrough was-price, -N% save badge (or "Special Buy"/"Special"),
+    "in your list" tag.
+- Version → v0.26 (scraper + device-scraper package.json → 0.26.0).
+
 ### v0.25 — 2026-08-15 (recipe picker layout fix)
 - Fixed the "+ Add meal" recipe picker: the "Add" button used `.btn.primary`
   which is `width:100%`, so inside the horizontal flex row it squashed the

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b7a4b">
 <meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
-<title>Shopping App · v0.25</title>
+<title>Shopping App · v0.26</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
@@ -214,6 +214,23 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 .screen.on{display:block;animation:fade .18s ease}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .store-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* ---------- specials columns + filters ---------- */
+.frow{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{border:1.5px solid var(--line);background:var(--bg2);color:var(--ink2);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.sp-head,.sp-row{display:grid;grid-template-columns:minmax(0,1fr) 86px 96px;gap:10px;align-items:center}
+.sp-head{font-size:11px;font-weight:800;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px;padding:4px 0 8px;border-bottom:1px solid var(--line)}
+.sp-row{padding:11px 0;border-bottom:1px solid var(--line)}
+.sp-row:last-child{border-bottom:0}
+.sp-item .nm{font-weight:700;font-size:14.5px;letter-spacing:-.2px;line-height:1.25}
+.sp-item .sub{font-size:11.5px;color:var(--ink2)}
+.sp-store{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.sp-price{font-size:13px}
+.sp-price b{font-size:15px}
+.sp-price .was{color:var(--ink2);text-decoration:line-through;font-weight:400;font-size:12px;margin-left:4px}
+.ta-r{text-align:right}
+.inlist-tag{font-size:9.5px;font-weight:800;color:var(--accent);background:rgba(11,122,75,.12);border-radius:999px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+[data-theme="dark"] .inlist-tag{background:rgba(47,191,128,.15)}
 @media (min-width:600px){.tabbar{border-radius:0}}
 </style>
 </head>
@@ -224,7 +241,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     <h1><span class="logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
     </span>Shopping<span style="color:var(--ink2);font-weight:600">App</span></h1>
-    <span class="ver-pill" id="verPill">v0.25</span>
+    <span class="ver-pill" id="verPill">v0.26</span>
     <span class="sync-badge" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">synced</span></span>
   </div>
 
@@ -332,7 +349,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     </div>
 
     <div class="card" style="text-align:center">
-      <p class="muted">Shopping App · <b>v0.25</b></p>
+      <p class="muted">Shopping App · <b>v0.26</b></p>
       <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
     </div>
   </section>
@@ -368,12 +385,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 
 <script>
 /* ============================================================
-   SHOPPING APP — v0.25
+   SHOPPING APP — v0.26
    Local-first PWA. Meal plan → aggregated ingredients → price-
    optimised shopping lists split across Coles / Woolworths / Aldi.
    ============================================================ */
 "use strict";
-const APP_VERSION = "v0.25";
+const APP_VERSION = "v0.26";
 const LS = (typeof localStorage !== "undefined") ? localStorage : null;
 
 /* ---------------- helpers ---------------- */
@@ -1453,6 +1470,8 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   let activeTab = "home";
   let pasteItems = [];
   let editingRecipeId = null;
+  let specialStore = "all";   // all | coles | woolworths | aldi
+  let specialSave = 0;        // 0 | 10 | 25 | 50  (minimum save %)
 
   function toast(msg){
     const t = $("toast"); t.textContent = msg; t.classList.add("show");
@@ -1778,51 +1797,86 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   }
 
   /* ---------- SPECIALS ---------- */
+  /* ---------- SPECIALS ---------- */
+  /* Unified specials list built from the catalogue: every item on special at
+     an enabled store, with save %/$ computed. */
+  function buildAllSpecials(){
+    const st = STATE.settings.stores;
+    const inListIds = new Set();
+    if(hasPlan()){
+      const list = buildShoppingList();
+      ["coles","woolworths","aldi"].forEach(s => (list.byStore[s]||[]).forEach(it => inListIds.add(it.id)));
+      list.manual.forEach(m => inListIds.add(m.name));
+    }
+    const out = [];
+    CAT.forEach(c => {
+      ["coles","woolworths"].forEach(s => {
+        const p = s === "coles" ? c.coles : c.wool;
+        if(!p || !st[s]) return;
+        const was = (p.w != null && p.w > p.p) ? p.w : null;
+        const special = !!p.s || !!was;
+        if(!special) return;
+        const saveDol = was ? +(was - p.p).toFixed(2) : 0;
+        const savePct = was ? Math.round(((was - p.p)/was)*100) : 0;
+        out.push({ id:c.id, name:c.name, size:fmtSize(p.q, p.u), store:s, price:p.p, was:was, saveDol:saveDol, savePct:savePct, promo:p.promo||null, inList:inListIds.has(c.id) });
+      });
+      if(st.aldi && c.aldiSpecial && c.aldiSpecial.note !== "Everyday price"){
+        const sp = c.aldiSpecial;
+        out.push({ id:c.id, name:c.name, size:fmtSize(sp.q, sp.u), store:"aldi", price:sp.price, was:null, saveDol:0, savePct:0, promo:sp.note||null, inList:inListIds.has(c.id) });
+      }
+    });
+    return out;
+  }
+  function fmtSize(q, u){
+    if(u === "kg") return Math.round(q*1000)+"g";
+    if(u === "L") return (q<1 ? Math.round(q*1000)+"mL" : q+"L");
+    return q>1 ? q+" pack" : "each";
+  }
+
   function renderSpecials(){
     const el = $("specialsContent");
-    const list = hasPlan() ? buildShoppingList() : null;
-    const aldi = CAT.filter(c => c.aldiSpecial);
-    const aldiSpecials = aldi.filter(c => c.aldiSpecial.note !== "Everyday price");
-    const aldiEveryday = aldi.filter(c => c.aldiSpecial.note === "Everyday price");
-    const tileRow = c => {
-      const sp = c.aldiSpecial;
-      const unitPrice = sp.price/sp.q;
-      const u = sp.u === "kg" ? "kg" : sp.u === "L" ? "L" : "each";
-      const sizeLabel = sp.u === "kg" ? Math.round(sp.q*1000)+"g" : sp.u === "L" ? sp.q+"L" : (sp.q>1 ? sp.q+" pack" : "each");
-      return `<div class="kv"><span>${esc(c.name)} <span class="muted">(${sizeLabel})</span></span>
-        <b>${fmtAUD(sp.price)} <span class="muted" style="font-weight:400">${fmtAUD2(unitPrice)}/${u}</span></b></div>`;
-    };
+    const all = buildAllSpecials();
 
-    let html = `<div class="card"><h2>Aldi Special Buys 🔥</h2>`;
-    html += (aldiSpecials.length ? aldiSpecials.map(tileRow).join("") : '<p class="muted">No Special Buys matched this week.</p>');
-    html += `<p class="hint">Aldi specials rotate Wednesday & Saturday. Items route to Aldi only when they beat your other stores.</p></div>`;
+    // filters
+    const storeFilter = (all.length || specialStore !== "all")
+      ? all.filter(x => specialStore === "all" || x.store === specialStore) : [];
+    const filtered = storeFilter.filter(x => x.savePct >= specialSave || x.saveDol >= (specialSave > 0 ? 0 : 0));
 
-    if(aldiEveryday.length){
-      html += `<div class="card"><h2>Aldi everyday prices 🛒</h2>`;
-      html += aldiEveryday.map(tileRow).join("");
-      html += `<p class="hint">Aldi's regular shelf prices for matched items — compared like any other store.</p></div>`;
+    const chip = (val, cur, label, action) =>
+      `<button class="fchip ${val===cur?"on":""}" data-action="${action}" data-val="${val}">${label}</button>`;
+
+    let html = `<div class="card">
+      <h2>Specials & savings 🏷️</h2>
+      <div class="frow">${["all","coles","woolworths","aldi"].map(v => chip(v, specialStore, v==="all"?"All":STORE_META[v].label, "special-filter-store")).join("")}</div>
+      <div class="frow" style="margin-top:6px">${[[0,"Any"],[10,"10%+"],[25,"25%+"],[50,"50%+"]].map(([v,l]) => chip(v, specialSave, l, "special-filter-save")).join("")}</div>
+      <p class="hint" style="margin-top:8px">${filtered.length} special item${filtered.length===1?"":"s"}${specialStore!=="all" ? " at " + STORE_META[specialStore].label : ""}${specialSave>0 ? " saving ≥" + specialSave + "%" : ""}</p>
+    </div>`;
+
+    if(filtered.length === 0){
+      html += `<div class="card empty" style="padding:20px"><div class="fx">🛎️</div><b>No specials match your filters</b><p class="muted">Try widening the store or saving filter.</p></div>`;
+      el.innerHTML = html;
+      return;
     }
 
-    if(list){
-      const matching = list.entries.filter(e => {
-        const o = chosenOpt(list, e.id);
-        return o && (o.special || (o.wasPrice && o.wasPrice > o.prod.p));
-      });
-      if(matching.length > 0){
-        html += `<div class="card"><h2>On special in your list 🏷️</h2>`;
-        html += matching.map(e => {
-          const o = chosenOpt(list, e.id);
-          const save = o.wasPrice && o.wasPrice > o.prod.p ? o.wasPrice - o.prod.p : null;
-          return `<div class="kv"><span>${esc(e.cat.name)} <span class="muted">· ${esc(o.prod.n||"")}</span></span>
-            <b>${fmtAUD(o.prod.p)}${save?` <span class="muted" style="font-weight:400;text-decoration:line-through">${fmtAUD(o.wasPrice)}</span>`:""}</b></div>`;
-        }).join("");
-        html += `</div>`;
-      } else {
-        html += `<div class="card empty" style="padding:20px"><div class="fx">🛎️</div><b>No specials match your list</b><p class="muted">Specials matching your meal plan will appear here.</p></div>`;
-      }
-    } else {
-      html += `<div class="card empty" style="padding:20px"><div class="fx">📅</div><b>Plan your meals first</b><p class="muted">We'll show specials that match your list.</p></div>`;
-    }
+    // column header + rows
+    html += `<div class="card" style="padding:12px 14px">
+      <div class="sp-head">
+        <span>Item</span><span>Store</span><span class="ta-r">Now · Save</span>
+      </div>` +
+      filtered.map(x => {
+        const saveBadge = x.savePct > 0
+          ? `<span class="badge move">-${x.savePct}%</span>`
+          : (x.store === "aldi" ? `<span class="badge aldi">Special Buy</span>` : `<span class="badge special">Special</span>`);
+        const wasStr = x.was ? `<span class="was">${fmtAUD(x.was)}</span>` : "";
+        const storeDot = `<span class="store-dot" style="background:${STORE_META[x.store].hex}"></span>`;
+        return `<div class="sp-row ${x.inList?"inlist":""}">
+          <div class="sp-item"><div class="nm">${esc(x.name)}${x.inList?' <span class="inlist-tag">in your list</span>':""}</div><div class="sub">${esc(x.size)}</div></div>
+          <div class="sp-store">${storeDot} ${STORE_META[x.store].label}</div>
+          <div class="sp-price ta-r"><b>${fmtAUD(x.price)}</b> ${wasStr}<br>${saveBadge}</div>
+        </div>`;
+      }).join("") +
+      `</div>`;
+
     el.innerHTML = html;
   }
   function hasPlan(){ return (STATE.plan.days||[]).some(d => (d.recipeIds||[]).length > 0); }
@@ -1893,6 +1947,8 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       case "rm-ing": node.closest(".ing-row").remove(); break;
       case "add-ingredient": { const rows = $("ingRows"); if(rows) rows.insertAdjacentHTML("beforeend", ingRowHtml(1, "", "")); break; }
       case "move-item": openMoveSheet(node.dataset.id); break;
+      case "special-filter-store": { specialStore = node.dataset.val; renderSpecials(); break; }
+      case "special-filter-save": { specialSave = parseInt(node.dataset.val,10)||0; renderSpecials(); break; }
       case "choose-move": { STATE.overrides[node.dataset.id] = node.dataset.store; saveOverrides(); closeModal(); toast("Moved to " + STORE_META[node.dataset.store].label); renderHome(); break; }
       case "reset-move": { delete STATE.overrides[node.dataset.id]; saveOverrides(); closeModal(); toast("Reset to auto"); renderHome(); break; }
       case "add-recipe-to-day": addRecipeToDay(parseInt(node.dataset.day,10), node.dataset.rid, parseInt(node.dataset.srv||"1",10)); break;
