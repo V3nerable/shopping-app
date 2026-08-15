@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b7a4b">
 <meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
-<title>Shopping App · v0.23</title>
+<title>Shopping App · v0.24</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
@@ -43,6 +43,8 @@ button{font-family:inherit}
   display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .logo svg{width:17px;height:17px}
 .sync-badge{font-size:11px;color:var(--ink2);display:flex;align-items:center;gap:5px;font-weight:600}
+.ver-pill{font-size:11px;font-weight:800;color:var(--accent);border:1.5px solid var(--accent);border-radius:999px;padding:2px 8px;letter-spacing:.3px;flex:0 0 auto}
+[data-theme="dark"] .ver-pill{color:var(--accent2);border-color:var(--accent2)}
 .dot{width:7px;height:7px;border-radius:50%;background:#4caf50;box-shadow:0 0 0 3px rgba(76,175,80,.18)}
 .dot.off{background:#f0a020;box-shadow:0 0 0 3px rgba(240,160,32,.18)}
 /* ---------- cards ---------- */
@@ -107,6 +109,8 @@ button{font-family:inherit}
 .badge.manual{background:#f0f0f0;color:#5c6b63}
 [data-theme="dark"] .badge.manual{background:#232323;color:#a9b3ad}
 .why{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:2px}
+.movebtn{background:transparent;border:1.5px solid var(--line);color:var(--ink2);border-radius:8px;width:26px;height:26px;font-size:13px;cursor:pointer;line-height:1;margin-top:3px}
+.movebtn:active{background:var(--bg2)}
 /* ---------- empty / onboarding ---------- */
 .empty{padding:34px 20px;text-align:center;color:var(--ink2)}
 .empty .fx{font-size:44px;margin-bottom:8px}
@@ -164,9 +168,13 @@ label.f{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:
 .dayrow:last-child{border-bottom:0}
 .dayrow .dt{display:flex;align-items:center;gap:8px}
 .dayrow .dt b{font-size:14px}
-.dayrow .dt .add{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:0}
-.mealchip{display:inline-flex;align-items:center;gap:7px;background:var(--bg2);border:1.5px solid var(--line);
+.dayrow .meals{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.dayrow .add{display:block;width:100%;margin-top:10px;border:1.5px dashed var(--line);background:transparent;border-radius:10px;padding:8px;font-size:12.5px;font-weight:700;color:var(--accent);cursor:pointer}
+.dayrow .add:active{background:var(--bg2)}
+.mealchip{display:flex;align-items:center;justify-content:space-between;gap:7px;background:var(--bg2);border:1.5px solid var(--line);
   border-radius:999px;padding:5px 6px 5px 12px;margin:6px 6px 0 0;font-size:13px;font-weight:600}
+.mealchip .mname{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mealchip .chip-right{display:flex;align-items:center;gap:7px;flex:0 0 auto}
 .mealchip .srv{color:var(--ink2);font-weight:700}
 .mealchip .rm{width:20px;height:20px;border-radius:50%;background:var(--line);color:var(--ink);border:0;cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
@@ -211,6 +219,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     <h1><span class="logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
     </span>Shopping<span style="color:var(--ink2);font-weight:600">App</span></h1>
+    <span class="ver-pill" id="verPill">v0.24</span>
     <span class="sync-badge" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">synced</span></span>
   </div>
 
@@ -318,7 +327,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     </div>
 
     <div class="card" style="text-align:center">
-      <p class="muted">Shopping App · <b>v0.23</b></p>
+      <p class="muted">Shopping App · <b>v0.24</b></p>
       <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
     </div>
   </section>
@@ -354,12 +363,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 
 <script>
 /* ============================================================
-   SHOPPING APP — v0.23
+   SHOPPING APP — v0.24
    Local-first PWA. Meal plan → aggregated ingredients → price-
    optimised shopping lists split across Coles / Woolworths / Aldi.
    ============================================================ */
 "use strict";
-const APP_VERSION = "v0.23";
+const APP_VERSION = "v0.24";
 const LS = (typeof localStorage !== "undefined") ? localStorage : null;
 
 /* ---------------- helpers ---------------- */
@@ -992,23 +1001,25 @@ function seedAldi(){ ALDI_SPECIALS.forEach(sp => { const c = CAT_BY_ID[sp.id]; i
 /* ---------------- state ---------------- */
 const DEFAULT_SETTINGS = { stores:{coles:true, woolworths:true, aldi:true}, splitPref:0.75, minSaving:2.00, maxStores:3, theme:"auto" };
 function loadState(){
-  let recipes=[], plan={period:7, days:[]}, settings=Object.assign({}, DEFAULT_SETTINGS, {stores:{coles:true,woolworths:true,aldi:true}}), checked={};
+  let recipes=[], plan={period:7, days:[]}, settings=Object.assign({}, DEFAULT_SETTINGS, {stores:{coles:true,woolworths:true,aldi:true}}), checked={}, overrides={};
   try{
     if(LS){
       if(LS.getItem("sa_recipes")) recipes = JSON.parse(LS.getItem("sa_recipes")) || [];
       if(LS.getItem("sa_plan")) plan = JSON.parse(LS.getItem("sa_plan")) || {period:7, days:[]};
       if(LS.getItem("sa_settings")){ const s = JSON.parse(LS.getItem("sa_settings")); settings = Object.assign({}, DEFAULT_SETTINGS, s, {stores:Object.assign({coles:true,woolworths:true,aldi:true}, s.stores||{})}); }
       if(LS.getItem("sa_checked")) checked = JSON.parse(LS.getItem("sa_checked")) || {};
+      if(LS.getItem("sa_overrides")) overrides = JSON.parse(LS.getItem("sa_overrides")) || {};
     }
   }catch(e){}
   if(!Array.isArray(plan.days)) plan.days = [];
-  return {recipes, plan, settings, checked};
+  return {recipes, plan, settings, checked, overrides};
 }
 let STATE = loadState();
 function saveRecipes(){ if(LS) LS.setItem("sa_recipes", JSON.stringify(STATE.recipes)); }
 function savePlan(){ if(LS) LS.setItem("sa_plan", JSON.stringify(STATE.plan)); }
 function saveSettings(){ if(LS) LS.setItem("sa_settings", JSON.stringify(STATE.settings)); }
 function saveChecked(){ if(LS) LS.setItem("sa_checked", JSON.stringify(STATE.checked)); }
+function saveOverrides(){ if(LS) LS.setItem("sa_overrides", JSON.stringify(STATE.overrides || {})); }
 
 /* ---------------- unit conversion ---------------- */
 const UNIT_WEIGHT = {g:1, gram:1, grams:1, kg:1000, kilos:1000};
@@ -1310,7 +1321,8 @@ function buildShoppingList(){
       const sp = cat.aldiSpecial;
       const prod = {q: sp.q, u: sp.u, p: sp.price, l:false};
       const c = computeCost(prod, amount, kind);
-      options.push({ store:"aldi", cost:c.cost, unitPrice:c.unitPrice, packs:c.packs, need:c.need, prod:{n:"ALDI " + cat.name, q: sp.q, u: sp.u, p: sp.price, s:true, promo: sp.note, until: sp.until}, special:true, aldi:true });
+      const isEveryday = sp.note === "Everyday price";
+      options.push({ store:"aldi", cost:c.cost, unitPrice:c.unitPrice, packs:c.packs, need:c.need, prod:{n:"ALDI " + cat.name, q: sp.q, u: sp.u, p: sp.price, s:!isEveryday, promo: sp.note, until: sp.until}, special:!isEveryday, aldi:true });
     }
     entries.push({ id, cat, amount, kind, options });
   });
@@ -1362,6 +1374,19 @@ function buildShoppingList(){
     used.add(c.alt.store);
   });
 
+  // apply manual move overrides (user pointed an item at a specific store)
+  const overrides = STATE.overrides || {};
+  Object.keys(overrides).forEach(id => {
+    const e = entries.find(x => x.id === id);
+    if(!e) return;
+    const o = e.options.find(x => x.store === overrides[id]);
+    if(o){
+      const prevBase = chosen[id] ? chosen[id].option.store : null;
+      chosen[id] = { option:o, fromBase:true, baseStore: prevBase || o.store, manual:true };
+      used.add(o.store);
+    }
+  });
+
   // group by store
   const order = ["coles","woolworths","aldi"];
   const byStore = {};
@@ -1370,7 +1395,7 @@ function buildShoppingList(){
   entries.forEach(e => {
     const ch = chosen[e.id];
     if(!ch){ return; }
-    byStore[ch.option.store].push({ id:e.id, cat:e.cat, amount:e.amount, kind:e.kind, option:ch.option, baseStore:ch.baseStore, moved: ch.option.store !== ch.baseStore });
+    byStore[ch.option.store].push({ id:e.id, cat:e.cat, amount:e.amount, kind:e.kind, option:ch.option, baseStore:ch.baseStore, moved: ch.option.store !== ch.baseStore, manualMove: !!ch.manual });
   });
   Object.keys(customs).forEach(k => manual.push({ name: customs[k].name, amount: customs[k].amount, kind: customs[k].kind }));
 
@@ -1499,7 +1524,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     const chips = list.usedStores.filter(s => STORE_META[s] && byStoreCount(list,s) > 0).map(s => `
       <span class="chip"><span class="sw" style="background:${STORE_META[s].hex}"></span>${STORE_META[s].label}
       <span class="sub">${byStoreCount(list,s)} · ${fmtAUD(byStoreTotal(list,s))}</span></span>`).join("");
-    const saveNote = list.savings > 0.005 ? `<div class="save">you save ${fmtAUD(list.savings)} by splitting</div>` : "";
+    const saveNote = list.savings > 0.005 ? `<div class="save">you save ${fmtAUD(list.savings)} by splitting</div>` : (list.savings < -0.005 ? `<div class="save" style="color:var(--ink2)">custom moves cost ${fmtAUD(-list.savings)} extra</div>` : "");
     html += `
       <div class="card">
         <div class="summary-total"><span class="big">${fmtAUD(list.total)}</span>${saveNote}</div>
@@ -1546,9 +1571,12 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       </div>`;
     }
 
-    html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
-      <span class="muted">Want a different split?</span>
-      <button class="btn sm soft" data-action="goto-more">Adjust threshold</button>
+    html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span class="muted">Tip: tap ↻ on an item to move it to another store.</span>
+      <div style="display:flex;gap:8px;flex:0 0 auto">
+        <button class="btn sm soft" data-action="load-samples">🧪 Samples</button>
+        <button class="btn sm soft" data-action="goto-more">Threshold</button>
+      </div>
     </div>`;
 
     el.innerHTML = html;
@@ -1561,10 +1589,12 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     const o = it.option;
     const onSpecial = o.special || (o.wasPrice && o.wasPrice > o.prod.p);
     let badges = "";
-    if(onSpecial) badges += `<span class="badge special">${o.promo || "Special"}</span>`;
-    if(store === "aldi") badges += `<span class="badge aldi">Aldi Special Buy</span>`;
+    if(store === "aldi") badges += `<span class="badge aldi">${esc(o.prod.promo || "Aldi")}</span>`;
+    else if(onSpecial) badges += `<span class="badge special">${esc(o.promo || "Special")}</span>`;
     let why = "";
-    if(it.moved && it.baseStore && STORE_META[it.baseStore]){
+    if(it.manualMove){
+      why = `<div class="why">Moved by you</div>`;
+    } else if(it.moved && it.baseStore && STORE_META[it.baseStore]){
       const saving = baseCostFor(it, list) - o.cost;
       if(saving > 0.005) why = `<div class="why">Save ${fmtAUD(saving)} vs ${STORE_META[it.baseStore].label}</div>`;
     }
@@ -1578,6 +1608,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       <div class="right">
         <div class="price">${fmtAUD(o.cost)}</div>
         <div class="unit">${fmtAUD2(o.unitPrice)}/${unitSymbol(it.kind)}</div>
+        <button class="movebtn" data-action="move-item" data-id="${it.id}" title="Move to another store">↻</button>
       </div>
     </div>`;
   }
@@ -1614,13 +1645,13 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
         const r = STATE.recipes.find(x => x.id === rid);
         if(!r) return "";
         const serves = (d.servings && d.servings[rid]) || r.baseServings || 1;
-        return `<span class="mealchip">${esc(r.name)} <span class="srv">×${serves}</span>
-          <button class="rm" data-action="remove-meal" data-day="${i}" data-rid="${rid}">✕</button></span>`;
+        return `<span class="mealchip"><span class="mname">${esc(r.name)}</span><span class="chip-right"><span class="srv">×${serves}</span>
+          <button class="rm" data-action="remove-meal" data-day="${i}" data-rid="${rid}">✕</button></span></span>`;
       }).join("");
       html += `<div class="dayrow">
-        <div class="dt"><b>Day ${i+1}</b><span class="muted" style="font-size:12px">${dayName(i)}</span>
-        <button class="add" data-action="pick-recipe" data-day="${i}">+ Add meal</button></div>
-        <div>${chips || '<span class="muted" style="font-size:12.5px">No meals yet</span>'}</div>
+        <div class="dt"><b>Day ${i+1}</b><span class="muted" style="font-size:12px">${dayName(i)}</span></div>
+        <div class="meals">${chips || '<span class="muted" style="font-size:12.5px">No meals yet</span>'}</div>
+        <button class="add" data-action="pick-recipe" data-day="${i}">+ Add meal</button>
       </div>`;
     });
     $("planDays").innerHTML = html;
@@ -1689,7 +1720,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       <input type="number" id="recServes" value="${r.baseServings||4}" min="1">
       <label class="f">Ingredients <span class="muted">(qty · unit · item)</span></label>
       <div id="ingRows">${ingRows}</div>
-      <button class="btn soft sm" id="addIngBtn" style="margin:2px 0 14px">+ Add ingredient</button>
+      <button class="btn soft sm" data-action="add-ingredient" style="margin:2px 0 14px">+ Add ingredient</button>
       <div class="btnrow">
         ${recipe ? '<button class="btn danger" data-action="delete-recipe">Delete</button>' : '<button class="btn ghost" data-action="close-modal">Cancel</button>'}
         <button class="btn primary" data-action="save-recipe">Save recipe</button>
@@ -1746,17 +1777,26 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     const el = $("specialsContent");
     const list = hasPlan() ? buildShoppingList() : null;
     const aldi = CAT.filter(c => c.aldiSpecial);
-
-    let html = `<div class="card"><h2>Aldi Special Buys 🔥</h2>`;
-    html += aldi.map(c => {
+    const aldiSpecials = aldi.filter(c => c.aldiSpecial.note !== "Everyday price");
+    const aldiEveryday = aldi.filter(c => c.aldiSpecial.note === "Everyday price");
+    const tileRow = c => {
       const sp = c.aldiSpecial;
       const unitPrice = sp.price/sp.q;
       const u = sp.u === "kg" ? "kg" : sp.u === "L" ? "L" : "each";
       const sizeLabel = sp.u === "kg" ? Math.round(sp.q*1000)+"g" : sp.u === "L" ? sp.q+"L" : (sp.q>1 ? sp.q+" pack" : "each");
       return `<div class="kv"><span>${esc(c.name)} <span class="muted">(${sizeLabel})</span></span>
         <b>${fmtAUD(sp.price)} <span class="muted" style="font-weight:400">${fmtAUD2(unitPrice)}/${u}</span></b></div>`;
-    }).join("");
+    };
+
+    let html = `<div class="card"><h2>Aldi Special Buys 🔥</h2>`;
+    html += (aldiSpecials.length ? aldiSpecials.map(tileRow).join("") : '<p class="muted">No Special Buys matched this week.</p>');
     html += `<p class="hint">Aldi specials rotate Wednesday & Saturday. Items route to Aldi only when they beat your other stores.</p></div>`;
+
+    if(aldiEveryday.length){
+      html += `<div class="card"><h2>Aldi everyday prices 🛒</h2>`;
+      html += aldiEveryday.map(tileRow).join("");
+      html += `<p class="hint">Aldi's regular shelf prices for matched items — compared like any other store.</p></div>`;
+    }
 
     if(list){
       const matching = list.entries.filter(e => {
@@ -1808,6 +1848,27 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
   /* ---------- modal ---------- */
   function closeModal(){ $("overlay").classList.remove("open"); }
 
+  /* ---------- move-item override ---------- */
+  function openMoveSheet(id){
+    const list = buildShoppingList();
+    const e = list.entries.find(x => x.id === id);
+    if(!e) return;
+    const curStore = STATE.overrides[id];
+    const opts = e.options.slice().sort((a,b) => (a.cost||1e9) - (b.cost||1e9));
+    $("sheet").innerHTML = `<h3>Move ${esc(e.cat.name)}</h3>
+      <p class="muted" style="margin:-6px 0 12px">Pick a store — it overrides the auto choice for this item only. Sorted cheapest first.</p>` +
+      opts.map(o => `
+        <div class="recipe" style="cursor:default;border-bottom:1px solid var(--line)">
+          <div class="av" style="background:${STORE_META[o.store].hex}22;font-size:11px;font-weight:800;color:${STORE_META[o.store].hex}">${STORE_META[o.store].label.slice(0,1)}</div>
+          <div class="main"><div class="nm">${STORE_META[o.store].label}</div>
+          <div class="sub">${fmtAUD(o.cost)} · ${fmtAUD2(o.unitPrice)}/${unitSymbol(e.kind)} · ${fmtPack(o, e.amount, e.kind)}${o.special ? " · 🔥 special" : ""}</div></div>
+          ${o.store === curStore ? '<span class="badge move">selected</span>' : `<button class="btn sm soft" data-action="choose-move" data-id="${e.id}" data-store="${o.store}">Move</button>`}
+        </div>`).join("") +
+      (curStore ? `<div class="btnrow" style="margin-top:14px"><button class="btn ghost" data-action="reset-move" data-id="${e.id}">Reset to auto</button></div>` : "") +
+      `<div class="btnrow" style="margin-top:10px"><button class="btn ghost" data-action="close-modal">Cancel</button></div>`;
+    $("overlay").classList.add("open");
+  }
+
   /* ---------- actions ---------- */
   function onAction(action, node){
     switch(action){
@@ -1825,6 +1886,10 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
       case "delete-recipe": deleteRecipe(); break;
       case "close-modal": closeModal(); break;
       case "rm-ing": node.closest(".ing-row").remove(); break;
+      case "add-ingredient": { const rows = $("ingRows"); if(rows) rows.insertAdjacentHTML("beforeend", ingRowHtml(1, "", "")); break; }
+      case "move-item": openMoveSheet(node.dataset.id); break;
+      case "choose-move": { STATE.overrides[node.dataset.id] = node.dataset.store; saveOverrides(); closeModal(); toast("Moved to " + STORE_META[node.dataset.store].label); renderHome(); break; }
+      case "reset-move": { delete STATE.overrides[node.dataset.id]; saveOverrides(); closeModal(); toast("Reset to auto"); renderHome(); break; }
       case "add-recipe-to-day": addRecipeToDay(parseInt(node.dataset.day,10), node.dataset.rid, parseInt(node.dataset.srv||"1",10)); break;
     }
   }
@@ -1926,7 +1991,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     $("stAldi").addEventListener("change", ev => { STATE.settings.stores.aldi = ev.target.checked; saveSettings(); });
     $("resetBtn").addEventListener("click", () => {
       if(!confirm("Delete all recipes, plans and settings?")) return;
-      if(LS){ LS.removeItem("sa_recipes"); LS.removeItem("sa_plan"); LS.removeItem("sa_settings"); LS.removeItem("sa_checked"); }
+      if(LS){ LS.removeItem("sa_recipes"); LS.removeItem("sa_plan"); LS.removeItem("sa_settings"); LS.removeItem("sa_checked"); LS.removeItem("sa_overrides"); }
       STATE = loadState(); renderHome(); renderRecipes(); renderPlan(); toast("All data cleared");
     });
     $("exportBtn").addEventListener("click", () => {
@@ -1956,6 +2021,7 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
     seedAldi();
     ensureSampleRecipes();
     applyTheme();
+    const vp = $("verPill"); if(vp) vp.textContent = APP_VERSION;
     wire();
     showTab("home");
     // try live feed (offline/preview safe)

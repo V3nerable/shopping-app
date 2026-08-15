@@ -119,6 +119,38 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.24 — 2026-08-15 (app fixes + Aldi full-line)
+- App UI fixes:
+  - Version pill in the TOP bar (`#verPill`, set from `APP_VERSION` at init) so
+    the version is always visible; synced by sed on future bumps.
+  - "+ Add ingredient" button fixed: now `data-action="add-ingredient"`
+    (event delegation) → appends a fresh `ingRowHtml(1,"","")` row to `#ingRows`.
+    Was completely unbound before.
+  - "🧪 Samples" button added to the Home summary card (visible even when a
+    plan exists), next to "Threshold".
+  - NEW move-item override: every shop row has a "↻" button → `openMoveSheet()`
+    lists the item's options across stores (cheapest first, with $, unit price,
+    pack, special flag) → "Move" saves `STATE.overrides[id]` (localStorage
+    `sa_overrides`) → "Reset to auto" clears it. `buildShoppingList()` applies
+    overrides after auto-routing (sets `manual:true`); rows show "Moved by you".
+    Negative savings now show "custom moves cost $X extra" instead of a bogus
+    save note. Reset-all also clears `sa_overrides`.
+  - Plan "+ Add meal" layout fixed: meals now render in a `.meals` column above
+    a full-width dashed "+ Add meal" button (was a cramped left-stacked chip).
+    Meal chips are now full-width rows (name left, ×servings + ✕ right).
+  - Aldi badge now shows the price's own note ("Special Buy" / "Everyday
+    price") instead of a hardcoded "Aldi Special Buy"; the Specials screen
+    splits Aldi Special Buys vs "Aldi everyday prices".
+- Aldi FULL-LINE scraper (`scrapeAldiFullLine()`): HTTP fetch of
+  `aldi.com.au/products` (SSR'd everyday products, reachable from datacenter),
+  extracts product tiles, matches the catalogue, returns "Everyday price"
+  entries. `runOnce()` merges specials + everyday (specials win) into
+  `feed.stores.aldi.specials`. The app treats note==="Everyday price" as
+  non-special (routes to Aldi like a normal store, not flagged as a deal).
+  Verified live: Jasmine Rice 1kg $2.99, Diced Tomatoes 400g $0.95, Sunflower
+  Oil 1L $4.99, Basa Fillets 1kg $6.99 matched the catalogue from the real page.
+- Version → v0.24 (scraper + device-scraper package.json → 0.24.0).
+
 ### v0.23 — 2026-08-15 (device-scraper: FULL aggregator harvest for Coles)
 - `parseAggProducts(data, store)` replaces `parseAggDiscounts`: handles the
   discounts `{sources:{woolies/coles/aldi}}` shape (priceHistory in cents),

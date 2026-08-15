@@ -1,5 +1,5 @@
 /**
- * Shopping App — home-device price feeder (v0.23)
+ * Shopping App — home-device price feeder (v0.24)
  * ================================================================
  * Runs on an always-on device on your RESIDENTIAL IP, so it sails past the
  * bot walls (Akamai / Incapsula) that block datacenter IPs. A real Chromium
@@ -207,6 +207,38 @@ async function scrapeAldi() {
   const specials = [...byId.values()];
   if (!specials.length) throw new Error("aldi: no specials matched the catalogue this week");
   return specials;
+}
+
+/* Aldi FULL-LINE prices (v0.24): aldi.com.au/products SSR's everyday products
+   (name + $price in the rendered HTML, reachable from any IP — no bot wall).
+   Extracts product tiles, matches them to the catalogue, keeps cheapest per
+   item. These become "Everyday price" entries (the app compares them like a
+   normal store rather than flagging them as specials). */
+async function scrapeAldiFullLine() {
+  const html = await fetchText("https://www.aldi.com.au/products");
+  const tiles = [];
+  for (const part of html.split('product-tile__name').slice(1)) {
+    const nm = part.match(/<p aria-label="([^"]*),?"/);
+    const name = nm ? nm[1].replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").trim().replace(/,$/, "") : null;
+    const pr = part.match(/base-price__regular"><span>\$([\d.]+)/);
+    if (!name || !pr) continue;
+    tiles.push({ name, price: parseFloat(pr[1]) });
+  }
+  if (tiles.length === 0) throw new Error("aldi: /products yielded no tiles (structure changed?)");
+
+  const seen = new Map();
+  for (const t of tiles) {
+    const id = matchCatalogue(t.name);
+    if (!id) continue;
+    const { q, u } = parseSize(t.name);
+    const prev = seen.get(id);
+    const entry = { id, name: t.name, price: t.price, q, u, note: "Everyday price", until: null };
+    if (!prev || entry.price < prev.price) seen.set(id, entry);
+  }
+  const items = [...seen.values()];
+  if (items.length === 0) throw new Error("aldi: /products matched nothing in the catalogue");
+  log("aldi full-line: matched", items.length, "items:", items.slice(0, 15).map(i => `${i.id} @ $${i.price}`).join(", "), items.length > 15 ? "…" : "");
+  return items;
 }
 
 /* ---------------- Coles & Woolworths (browser) -------------------------- */
@@ -1281,12 +1313,18 @@ async function runOnce() {
     if (ctx) await ctx.close();
   }
 
-  // Aldi (HTTP)
+  // Aldi (HTTP) — weekly specials + everyday full-line prices
   try {
     const specials = await scrapeAldi();
-    feed.stores.aldi = { source: "specials-catalogue", asOf: new Date().toISOString(), specials };
+    let everyday = [];
+    try { everyday = await scrapeAldiFullLine(); } catch (ee) { log("aldi full-line skipped —", ee.message); }
+    // merge: specials win; everyday fills in items with no special this week
+    const byId = new Map(specials.map(s => [s.id, s]));
+    for (const ev of everyday) { if (!byId.has(ev.id)) byId.set(ev.id, ev); }
+    const merged = [...byId.values()];
+    feed.stores.aldi = { source: "specials-catalogue", asOf: new Date().toISOString(), specials: merged };
     okCount++;
-    log("aldi: ok —", specials.length, "specials:", specials.map(s => `${s.id} @ $${s.price}`).join(", "));
+    log("aldi: ok —", merged.length, "prices (", specials.length, "specials +", everyday.length, "everyday):", merged.slice(0, 10).map(s => `${s.id} @ $${s.price}`).join(", "), merged.length > 10 ? "…" : "");
   } catch (e) {
     log("aldi: stale —", e.message);
     if (feed.stores.aldi && feed.stores.aldi.asOf) feed.stores.aldi.stale = true;

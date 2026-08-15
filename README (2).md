@@ -1,4 +1,4 @@
-# Shopping App — v0.23
+# Shopping App — v0.24
 
 Meal prep → price-optimised shopping lists, split across **Coles, Woolworths
 and Aldi** by cheapest unit price.
