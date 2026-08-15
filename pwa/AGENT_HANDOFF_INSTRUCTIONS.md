@@ -114,10 +114,281 @@ On every deploy command, bump the version by **exactly 0.01** in ALL of:
 4. The master zip name: `Shopping-App-v0.XX.zip`.
 5. `scraper/package.json` (`"version"`) and `device-scraper/package.json`
    (`"version"`) — keep them aligned as `0.X.0` matching the app's minor
-   (e.g. app v0.08 → `"0.8.0"` in both).
+   (e.g. when the app is `v0.XX`, both packages read `"0.X.0"`).
 Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
+
+### v0.24 — 2026-08-15 (app fixes + Aldi full-line)
+- App UI fixes:
+  - Version pill in the TOP bar (`#verPill`, set from `APP_VERSION` at init) so
+    the version is always visible; synced by sed on future bumps.
+  - "+ Add ingredient" button fixed: now `data-action="add-ingredient"`
+    (event delegation) → appends a fresh `ingRowHtml(1,"","")` row to `#ingRows`.
+    Was completely unbound before.
+  - "🧪 Samples" button added to the Home summary card (visible even when a
+    plan exists), next to "Threshold".
+  - NEW move-item override: every shop row has a "↻" button → `openMoveSheet()`
+    lists the item's options across stores (cheapest first, with $, unit price,
+    pack, special flag) → "Move" saves `STATE.overrides[id]` (localStorage
+    `sa_overrides`) → "Reset to auto" clears it. `buildShoppingList()` applies
+    overrides after auto-routing (sets `manual:true`); rows show "Moved by you".
+    Negative savings now show "custom moves cost $X extra" instead of a bogus
+    save note. Reset-all also clears `sa_overrides`.
+  - Plan "+ Add meal" layout fixed: meals now render in a `.meals` column above
+    a full-width dashed "+ Add meal" button (was a cramped left-stacked chip).
+    Meal chips are now full-width rows (name left, ×servings + ✕ right).
+  - Aldi badge now shows the price's own note ("Special Buy" / "Everyday
+    price") instead of a hardcoded "Aldi Special Buy"; the Specials screen
+    splits Aldi Special Buys vs "Aldi everyday prices".
+- Aldi FULL-LINE scraper (`scrapeAldiFullLine()`): HTTP fetch of
+  `aldi.com.au/products` (SSR'd everyday products, reachable from datacenter),
+  extracts product tiles, matches the catalogue, returns "Everyday price"
+  entries. `runOnce()` merges specials + everyday (specials win) into
+  `feed.stores.aldi.specials`. The app treats note==="Everyday price" as
+  non-special (routes to Aldi like a normal store, not flagged as a deal).
+  Verified live: Jasmine Rice 1kg $2.99, Diced Tomatoes 400g $0.95, Sunflower
+  Oil 1L $4.99, Basa Fillets 1kg $6.99 matched the catalogue from the real page.
+- Version → v0.24 (scraper + device-scraper package.json → 0.24.0).
+
+### v0.23 — 2026-08-15 (device-scraper: FULL aggregator harvest for Coles)
+- `parseAggProducts(data, store)` replaces `parseAggDiscounts`: handles the
+  discounts `{sources:{woolies/coles/aldi}}` shape (priceHistory in cents),
+  flat arrays, and `{results:[…]}` shapes, with a unit heuristic (price > 200 →
+  cents) and store filtering.
+- `scrapeAggregator` now paginates the WHOLE discounts API until empty
+  (`AGG_PAGES` default 60, QUICK=2) — captures every special across chains.
+- NEW `scrapeAggregatorSearch(page, storeFilter, alreadyHave)`: self-adapting
+  per-item search — navigates `/products`, triggers a search (broad input
+  detection, then URL-param fallback), captures the `/api/*` request the page
+  makes, and replays it for every catalogue item not already covered. Logs the
+  template URL, first-response sample, and progress every 25 items.
+- `runOnce()` Coles chain now merges discounts + search (cheapest per id):
+  `coles: aggregator ok — N items (discounts X + search Y)`. Direct browse
+  remains first choice; direct /catalogues remains last fallback.
+- Removed the `AGG_DISCOVER` flag/hook (search discovery is now automatic).
+- Verified parser against 3 shapes (cents sources, dollar flat array, cents
+  results) + store filter.
+- Version → v0.23 (scraper + device-scraper package.json → 0.23.0).
+
+### v0.22 — 2026-08-15 (device-scraper: ausgroceryprices.com harvester)
+- The v0.21 probe found the aggregator's OPEN JSON API:
+  `GET https://ausgroceryprices.com/api/v1/products/discounts/{page}` → 200,
+  no auth. Response `{_id, sources:{woolies:[],coles:[],aldi:[],...}}` with
+  products carrying `name` + `priceHistory[{availablePrice,defaultPrice}]`
+  (prices in CENTS; "NOW $6.75 WAS $13.50" = 675/1350).
+- Added `parseAggDiscounts(data)` (cents→dollars, was = defaultPrice when
+  higher, onSpecial flag; `AGG_STORE_MAP` = woolies→woolworths, coles→coles,
+  aldi→aldi) and `scrapeAggregator(page, storeFilter)`: visits `/discounts`,
+  in-page fetches up to `AGG_PAGES` (default 10, QUICK=2) pages, matches tiles
+  to the catalogue with the prepared/species guard, cheapest per store:id.
+- `runOnce()` Coles chain is now: direct browse → **aggregator (coles
+  specials)** → direct /catalogues. So Coles finally gets live specials.
+- Added `discoverAggregatorSearch(page)` — probes 4 candidate search endpoints
+  in-page and logs status + sample, to find a full-search route for later.
+- Verified `parseAggDiscounts` against the exact probe payload: 5/5 tiles
+  parsed, cents converted, specials flagged, catalogue matches correct.
+- Version → v0.22 (scraper + device-scraper package.json → 0.22.0).
+
+### v0.21 — 2026-08-15 (device-scraper: deep aggregator probe)
+- Upgraded `probeAggregator()`: instead of only loading the homepage, it now
+  visits `https://ausgroceryprices.com/products` and `/discounts`, captures
+  EVERY `/api/*` request (method + URL) and logs each `/api/*` response's
+  status + a 500-char sample. On `/products` it also does a best-effort search
+  interaction (finds an input, types "chicken", presses Enter) so the site
+  makes its real data calls. Logs final URL, title, and 400 chars of body.
+  First probe confirmed: the site loads on the residential device, and a live
+  API exists (`/api/v1/auth/me` → 401), so the product endpoint should be under
+  `/api/v1/*`. This version finds its exact name + shape.
+- Version → v0.21 (scraper + device-scraper package.json → 0.21.0).
+
+### v0.20 — 2026-08-15 (device-scraper: CORRECT Coles browse route)
+- Found the real Coles data route via the open-source project
+  tjhowse/aus_grocery_price_database (powering auscost.com.au). The search
+  route we were hitting (`/search/products.json`) is Incapsula-gated; the
+  WORKING route is browse-by-category:
+  `GET /_next/data/{buildId}/en/browse/{slug}.json?slug={slug}&page=N` with
+  header `x-nextjs-data: 1`. Response: `pageProps.searchResults.results[]`,
+  keep `_type === "PRODUCT"`, read `name` + `pricing.now/was/onlineSpecial`.
+- Added `parseColesBrowse()` (parses the above; treats was<=0 as no-prev-price)
+  and `scrapeColesBrowse(page)`: visits `/browse`, reads `buildId` from
+  `__NEXT_DATA__`, in-page fetches pages of `COLES_CATEGORIES`
+  (meat-seafood, fruit-vegetables, dairy-eggs-fridge, bakery, deli, pantry,
+  drinks, frozen, household), matches tiles to the catalogue with the
+  prepared/species guard, cheapest per item. `COLES_MAX_PAGES` env (default 3,
+  QUICK=1 page of 2 categories).
+- `runOnce()` Coles now uses `scrapeColesBrowse` as PRIMARY (source "scraped"),
+  with the /catalogues specials pass as fallback.
+- VERIFIED against the repo's real `fruit-vegetables_1.json`: 47 products
+  parsed, 20 matched our catalogue (Broccoli $1.19, Green Zucchini $1.18,
+  Carrots Loose $0.42, Iceberg Lettuce $2.9, Strawberries $2.9 …).
+- Version → v0.20 (scraper + device-scraper package.json → 0.20.0).
+
+### v0.19 — 2026-08-15 (device-scraper: match guard expansion + aggregator probe)
+- Match guard widened: `NEG_WORDS` now also rejects "diced/chopped/sliced/
+  strips/minced/coated/battered/seasoned/flavoured/crumb(s)" (still allowed
+  when the word is part of the item's own name/aliases, e.g. "diced tomatoes").
+  FIXED a guard bug: the prepared/species check was substring-based, so
+  `"strip"` matched inside `"strips"` and wrongly rejected "Beef Stir Fry
+  Strips" for beef-strips. Now token-based (`norm(t.name)`), so only whole
+  words trigger it. Verified 12/12 cases (rejects diced/sliced/strips/minced/
+  shredded/mixed-species chicken+beef tiles; accepts fillet/fillets/beef mince/
+  beef stir-fry strips/diced tomatoes/smoked salmon).
+- New `PROBE=1` mode: `probeAggregator()` loads grocery-aggregator sites
+  (ausgroceryprices.online / .com) in the device's real browser, logs page
+  title + body (Cloudflare block check), and every JSON/API request the page
+  makes (method, URL, status, content-type, truncated sample) — to judge
+  whether an aggregator exposes an API we could piggyback on for Coles.
+  No scraping or pushing in this mode. Runs before `--once` and exits.
+- Version → v0.19 (scraper + device-scraper package.json → 0.19.0).
+
+### v0.18 — 2026-08-15 (device-scraper: native Chrome + match accuracy)
+- NATIVE_CHROME=1: `launchBrowser()` now uses `channel: "chrome"` (the
+  system-installed Google Chrome) instead of the bundled Chromium, and logs the
+  channel/headless/platform. For the Coles Incapsula wall — real Windows Chrome
+  is the most human-like fingerprint available. Documented in README with full
+  PowerShell steps (Node via winget, PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1, QUICK
+  test run without a token, then full run with GH_TOKEN/GH_REPO).
+- Coles reload-on-challenge: after the ~20s poll, if still challenged, does ONE
+  `page.reload()` + 5s wait + 10s poll (Incapsula often sets its session cookie
+  on the first challenge and lets the reload through).
+- Match-accuracy fix: new `NEG_WORDS` + `SPECIES` sets and a score-based
+  selection in `scrapeStore` — a tile is rejected if it mentions a
+  prepared-word ("shredded"/"crumbed"/"cooked"/… ) or a species word
+  ("pork"/"beef"/…) that isn't in the item's own name/aliases, so
+  "Shredded Chicken Breast" can no longer stand in for chicken-breast and
+  "Pork & Beef Mince" can't stand in for beef-mince. Prefers exact catalogue
+  match (3) > substring (2) > name (1), tie-break cheapest. Verified: 8/8 cases
+  (rejects the two wrong matches, accepts fillet/mince/rice/thigh/smoked-salmon).
+- cleanStaleProfileLocks() skips the Linux-only /proc liveness check on win32.
+- Version → v0.18 (scraper + device-scraper package.json → 0.18.0).
+
+### v0.17 — 2026-08-14 (device-scraper: exact-key Woolworths parser)
+- The raw API sample finally revealed the real Woolworths shape:
+  `{"Products":[{"Products":[{…tiles…}]}]}` — double-wrapped. Rather than rely
+  on the structural finder, added `parseWoolAny(data)`: walks every object and
+  keeps any carrying an EXACT name key (`Name`/`DisplayName`/`Title`, any case)
+  plus a real pack price (`Price` → `InstorePrice` → first non-cup/unit/
+  incremental/label `*price*` key). Unit-price labels ("Price per Kg charged",
+  CupPrice, IncrementalPrice) can no longer be mistaken for products.
+- Woolworths extraction order is now `parseWoolAny` → `parseWoolApi` →
+  `parseAnyProducts` (in-page API and `__NEXT_DATA__` paths both).
+- New diagnostic when tiles===0: logs the top-level API keys and
+  `Products` isArray/length, so the wrapper shape is visible next run.
+- Verified against the exact real payload: 39/39 products extracted with real
+  names and pack prices.
+- Version → v0.17 (scraper + device-scraper package.json → 0.17.0).
+
+### v0.16 — 2026-08-14 (device-scraper: dict/Apollo-state product finder)
+- New clue from v0.15 log: `apiNote: data, tiles=0` — the in-page API returned
+  JSON but no parser found a product array. `findProductArray()` only scanned
+  ARRAYS; Woolworths stores results as a keyed DICTIONARY (Apollo
+  `__APOLLO_STATE__` / Redux `byId`), which it now also detects:
+  - `isProductLike()` shared helper (name-ish string + price-ish numeric,
+    excluding dunder keys like `__typename`).
+  - Object nodes are now scored by how many of their VALUES are product-like;
+    a dict with ≥2 product values becomes the collection.
+  - `parseAnyProducts()` name/price/was key detection now ignores `__`-prefixed
+    keys (fixes "Product" being read as the name from `__typename`).
+- Raw API sample: when tiles===0 but the in-page fetch returned data, the
+  diagnostic now logs the first 600 chars of the raw JSON, so the exact shape
+  is visible next run instead of another guess.
+- apiNote now always includes the HTTP status ("status 200, tiles=0").
+- Coles specials pass now uses `parseAnyProducts` too.
+- Verified in a logic test: parses Apollo dicts, Redux byId stores, and plain
+  arrays, all with real names/prices.
+- Version → v0.16 (scraper + device-scraper package.json → 0.16.0).
+
+### v0.15 — 2026-08-14 (device-scraper: self-adapting product parser)
+- Root cause: `parseWoolApi` hardcoded the key `Products[].Name/Price`, but the
+  live API response doesn't use that shape, so the generic scanner grabbed junk
+  ("Price per Kg charged") objects. Added a structure-based parser:
+  - `findProductArray(data)` — walks any JSON blob and returns the array whose
+    elements look most like products (objects with BOTH a name-ish string field
+    and a price-ish numeric field), scoring each array and picking the best
+    (so a junk array never beats the real product list).
+  - `parseAnyProducts(data)` — maps that array to tiles with flexible
+    name/price/was key detection per element (case-insensitive), and carries
+    `_keys` on each tile for diagnostics.
+- Extraction order now: in-page API (parseWoolApi/parseColesData fast-path, then
+  parseAnyProducts) → `__NEXT_DATA__` (same chain) → intercepted responses →
+  DOM walk.
+- Diagnostic on the first item now always logs `apiNote` (data/status) and the
+  sample tile's `_keys`, so if it STILL misses, the next log shows the exact
+  key names.
+- Verified in a logic test: extracts real products from nested/camelCase/mixed
+  shapes and correctly rejects the junk array.
+- Version → v0.15 (scraper + device-scraper package.json → 0.15.0).
+
+### v0.14 — 2026-08-14 (device-scraper: Woolies __NEXT_DATA__ + Coles specials)
+- Woolworths fix: the page's server-rendered `__NEXT_DATA__` (confirmed present
+  via ground-truth, `hasNextData: true`) is now scanned BEFORE the DOM walk,
+  which was winning with junk unit-price labels ("Price per Kg charged"). New
+  extraction order: in-page API → `__NEXT_DATA__` (parseWoolApi on the blob +
+  props.pageProps, then parseColesData, then scanProductsJson) → intercepted
+  responses → DOM walk. In-page API now logs "yielded no tiles — status/…" so a
+  silent miss is visible.
+- Coles: after landing on search, polls up to ~20s for `__NEXT_DATA__`/body
+  text (Incapsula sometimes self-solves and reloads).
+- Coles specials fallback: `scrapeColesSpecials()` visits `/catalogues` (which
+  answered 200 with `__NEXT_DATA__` + `product-tile` markers from datacenter),
+  scans its JSON + DOM, fuzzy-matches special-priced products to the catalogue
+  (cheapest wins), and returns onSpecial items. `runOnce()` falls back to it
+  when full-line Coles fails, emitting `source: "specials-catalogue"` for Coles.
+- Version → v0.14 (scraper + device-scraper package.json → 0.14.0).
+
+### v0.13 — 2026-08-14 (device-scraper: in-page API + self-heal + ground truth)
+- Profile-lock self-heal: `cleanStaleProfileLocks()` deletes Chromium's
+  `SingletonLock/SingletonCookie/SingletonSocket` when the lock's PID is no
+  longer alive, so a crash/power-cut can't block the next launch ("profile
+  appears to be in use"). Logs when a lock is still live. README now says to
+  `docker compose stop` before one-off runs (shared profile volume).
+- In-page same-origin API fetch (the deterministic path): `fetchInPage()` runs
+  `fetch()` INSIDE the loaded page with session cookies attached.
+  - Woolworths: POST `/apis/ui/Search/products` → `parseWoolApi()`.
+  - Coles: reads `buildId` from `__NEXT_DATA__` then GETs
+    `/_next/data/{buildId}/search/products.json?q=…` → `parseColesData()`.
+  Fallbacks preserved: intercepted responses, DOM walk, `__NEXT_DATA__` scan.
+- Ground-truth dump (`dumpGroundTruth()`): on the first item, logs readyState,
+  hasNextData, hasMainIframe, bodyChildren, bodyText, first 8 product-ish
+  links, first 8 `$` nodes (tag/class/text), and window state globals — so the
+  next fix uses exact selectors instead of guesses.
+- Version → v0.13 (scraper + device-scraper package.json → 0.13.0).
+
+### v0.12 — 2026-08-14 (device-scraper: headed default + name extraction)
+- BREAKTHROUGH (user's device): headed Chromium under a manually-started Xvfb
+  cleared Akamai — Woolworths returned the real search page ("Chicken Breast -
+  Woolworths Online", 36 tiles). Two bugs fixed on top:
+  - Extraction was pairing prices with unit-price labels ("Price per Kg
+    charged") instead of product names. `extractProducts(page, store)` now
+    prefers product-detail links (`a[href*="/shop/productdetails/"]` for
+    Woolworths, `a[href*="/product/"]` for Coles) — name from the link/heading,
+    price from the tile — with the `$`-climb as fallback and "per kg/100g/each"
+    labels excluded.
+  - Coles still served an empty shell; now uses `waitUntil: "networkidle"` +
+    6s settle + 6 scrolls per search, longer 8s homepage warm-up, warm-up
+    title logging, and a `body snippet` diagnostic when tiles===0 so we can see
+    exactly what Coles is serving.
+- Headed is now the DEFAULT (`HEADLESS=1` to opt out). `launchBrowser()`:
+  `headless = process.env.HEADLESS === "1"`.
+- Entrypoint rewritten to use the proven manual Xvfb approach (start `Xvfb :99`
+  + `DISPLAY=:99`) instead of `xvfb-run`, which hung.
+- README + compose comments updated.
+- Version → v0.12 (scraper + device-scraper package.json → 0.12.0).
+
+### v0.11 — 2026-08-14 (device-scraper: entrypoint/xvfb fix)
+- Fixed a Dockerfile bug: `ENTRYPOINT ["node", "scraper.mjs"]` swallowed any
+  command passed to `docker compose run scraper <cmd>`, so the documented
+  `xvfb-run node scraper.mjs --once` never actually ran xvfb and headed mode
+  crashed with "Missing X server or $DISPLAY".
+- Replaced it with `docker-entrypoint.sh` (wraps the command in
+  `xvfb-run -a` when `HEADED=1`, else execs as-is) + `CMD ["node",
+  "scraper.mjs"]`. Now `docker compose run scraper <cmd>` works as expected and
+  headed mode needs no `--entrypoint` hack.
+- Added `xvfb` to the image's apt packages (explicit, even though the Playwright
+  base image usually ships it).
+- README headed-mode instructions updated.
+- Version → v0.11 (scraper + device-scraper package.json → 0.11.0).
 
 ### v0.10 — 2026-08-14 (device-scraper: anti-bot stealth)
 - Root cause found via v0.09 diagnostics: Woolworths returned `title: "Access
