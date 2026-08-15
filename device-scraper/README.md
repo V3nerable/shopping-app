@@ -61,16 +61,21 @@ docker compose run --rm -e RUN_ONCE=1 scraper node scraper.mjs --once
 
 **Quick verification (only 3 items per store, ~1 minute):**
 ```bash
+docker compose stop                    # stop the scheduler first — both share the profile volume
 docker compose run --rm -e QUICK=1 -e RUN_ONCE=1 scraper node scraper.mjs --once
 ```
+> The scheduler and a one-off run both mount the same `profile` volume, so
+> always stop the scheduler first. Stale locks left by a crash are removed
+> automatically at launch.
 
-**If a store still shows "Access Denied" (nuclear option — headed browser):**
+**Headed by default:** the stores block headless browsers, so the scraper now
+runs **headed Chromium under a virtual display automatically** (the container
+entrypoint starts Xvfb). No extra flags needed.
+
+**Force truly headless** (only useful for Aldi-only runs):
 ```bash
-docker compose run --rm -e QUICK=1 -e HEADED=1 -e RUN_ONCE=1 scraper xvfb-run node scraper.mjs --once
+docker compose run --rm -e QUICK=1 -e HEADLESS=1 -e RUN_ONCE=1 scraper node scraper.mjs --once
 ```
-The scraper runs stealth headless by default (full Chromium, automation markers
-stripped); `HEADED=1` forces a headed browser under `xvfb-run`, which is the
-most human-like profile and usually clears the last stubborn bot walls.
 
 ## Option B — Plain Linux (no Docker)
 
@@ -125,6 +130,56 @@ WantedBy=multi-user.target
 - `.env` is already listed in the repo's `.gitignore`, so a normal
   `git add .` won't commit it — but double-check with `git status` before
   pushing if you're unsure.
+
+## Windows native run — real Chrome (the Coles attempt)
+
+Coles is gated by Incapsula, which detects the *containerised* browser even on
+a residential IP. The strongest counter is running the scraper **natively on
+Windows with your real, installed Google Chrome** — the most human-like
+fingerprint there is.
+
+```powershell
+# 1. Install Node if missing (then close & reopen PowerShell):
+winget install OpenJS.NodeJS.LTS
+
+# 2. Get the project files locally (zip or git clone) and enter the folder:
+cd C:\Users\beaum\shopping-app\device-scraper
+
+# 3. Install deps WITHOUT downloading Playwright browsers (we use system Chrome):
+$env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="1"
+npm install
+
+# 4. Quick Coles test (no git push — just watch the log):
+$env:QUICK="1"
+$env:NATIVE_CHROME="1"
+node scraper.mjs --once
+
+# 5. Full run + push (add your token + repo):
+$env:GH_TOKEN="github_pat_...."
+$env:GH_REPO="V3nerable/shopping-app"
+$env:NATIVE_CHROME="1"
+node scraper.mjs --once
+```
+
+Notes:
+- Requires Google Chrome installed (it almost certainly is).
+- The profile lives in `device-scraper/profile` — a fresh one each first run.
+- If Coles still shows `hasMainIframe: true` after this, the challenge is
+  tied to the profile age/behaviour — the next escalation is pointing
+  `PROFILE_DIR` at your real Chrome user-data dir (Chrome must be closed).
+
+### Probe an aggregator for a usable API (diagnostics only)
+
+To see whether a grocery-aggregator site (e.g. ausgroceryprices) exposes an
+internal JSON API we could piggyback on for Coles:
+
+```powershell
+cd C:\Users\beaum\shopping-app\device-scraper
+$env:PROBE="1"; $env:NATIVE_CHROME="1"; node scraper.mjs --once
+```
+
+It loads the site in real Chrome, logs the page title/body (block check), and
+lists every JSON/API request the page makes — paste that log back to decide.
 
 ## Schedule
 | Task | Default (UTC) | Your time (AWST) |
