@@ -119,6 +119,16 @@ Then rebuild the zip with the full `pwa/` directory (including this file).
 
 ## 7. Changelog (technical, per version)
 
+### v0.25 — 2026-08-15 (recipe picker layout fix)
+- Fixed the "+ Add meal" recipe picker: the "Add" button used `.btn.primary`
+  which is `width:100%`, so inside the horizontal flex row it squashed the
+  recipe name/"serves" into a tight left clump and overlapped the row. Each
+  recipe is now a `.picker-item` block: heading line (emoji + name + serves)
+  with the full-width Add button underneath it. The sheet title now shows the
+  day name too ("Add a meal — Day 1 (Mon)") plus a helper line.
+- New CSS: `.picker-item` / `.picker-head` (flex column of heading + button).
+- Version → v0.25 (scraper + device-scraper package.json → 0.25.0).
+
 ### v0.24 — 2026-08-15 (app fixes + Aldi full-line)
 - App UI fixes:
   - Version pill in the TOP bar (`#verPill`, set from `APP_VERSION` at init) so

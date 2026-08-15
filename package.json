@@ -2,7 +2,7 @@
   "name": "shopping-device-scraper",
   "private": true,
   "type": "module",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Home-device price feeder for the Shopping App. Runs a real Chromium browser on your residential IP to scrape Coles + Woolworths full-line prices and Aldi Special Buys, then pushes prices.json to the repo (Netlify auto-publishes).",
   "engines": { "node": ">=18" },
   "scripts": {

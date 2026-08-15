@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b7a4b">
 <meta name="description" content="Meal prep → price-optimised shopping lists split across Coles, Woolworths and Aldi.">
-<title>Shopping App · v0.24</title>
+<title>Shopping App · v0.25</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
@@ -163,6 +163,11 @@ label.f{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:
 .recipe .nm{font-weight:700;font-size:15px}
 .recipe .sub{font-size:12px;color:var(--ink2)}
 .recipe .ch{color:var(--ink2);font-size:18px}
+.picker-item{border-bottom:1px solid var(--line);padding:13px 0}
+.picker-item:last-of-type{border-bottom:0}
+.picker-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.picker-head .main{flex:1;min-width:0}
+.picker-item .btn{width:100%}
 /* ---------- day rows ---------- */
 .dayrow{border-bottom:1px solid var(--line);padding:12px 0}
 .dayrow:last-child{border-bottom:0}
@@ -219,7 +224,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     <h1><span class="logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
     </span>Shopping<span style="color:var(--ink2);font-weight:600">App</span></h1>
-    <span class="ver-pill" id="verPill">v0.24</span>
+    <span class="ver-pill" id="verPill">v0.25</span>
     <span class="sync-badge" id="syncBadge"><span class="dot" id="syncDot"></span><span id="syncTxt">synced</span></span>
   </div>
 
@@ -327,7 +332,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
     </div>
 
     <div class="card" style="text-align:center">
-      <p class="muted">Shopping App · <b>v0.24</b></p>
+      <p class="muted">Shopping App · <b>v0.25</b></p>
       <p class="hint">Local-first PWA. Prices refresh via the GitHub price feed. Data stays on your device.</p>
     </div>
   </section>
@@ -363,12 +368,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:26px}
 
 <script>
 /* ============================================================
-   SHOPPING APP — v0.24
+   SHOPPING APP — v0.25
    Local-first PWA. Meal plan → aggregated ingredients → price-
    optimised shopping lists split across Coles / Woolworths / Aldi.
    ============================================================ */
 "use strict";
-const APP_VERSION = "v0.24";
+const APP_VERSION = "v0.25";
 const LS = (typeof localStorage !== "undefined") ? localStorage : null;
 
 /* ---------------- helpers ---------------- */
@@ -1912,11 +1917,14 @@ const UI = (typeof document !== "undefined" && document.getElementById) ? (funct
 
   function openPicker(day){
     if(STATE.recipes.length === 0){ toast("Add a recipe first"); showTab("recipes"); return; }
-    $("sheet").innerHTML = `<h3>Add a meal — Day ${day+1}</h3>` +
+    $("sheet").innerHTML = `<h3>Add a meal — Day ${day+1} (${dayName(day)})</h3>` +
+      `<p class="muted" style="margin:-6px 0 12px">Tap Add under a recipe to assign it to this day.</p>` +
       STATE.recipes.map(r => `
-        <div class="recipe" style="border-bottom:1px solid var(--line);cursor:default">
-          <div class="av">🍽️</div>
-          <div class="main"><div class="nm">${esc(r.name)}</div><div class="sub">serves ${r.baseServings||1}</div></div>
+        <div class="picker-item">
+          <div class="picker-head">
+            <div class="av">🍽️</div>
+            <div class="main"><div class="nm">${esc(r.name)}</div><div class="sub">serves ${r.baseServings||1}</div></div>
+          </div>
           <button class="btn sm primary" data-action="add-recipe-to-day" data-day="${day}" data-rid="${r.id}" data-srv="${r.baseServings||1}">Add</button>
         </div>`).join("") +
       `<div class="btnrow" style="margin-top:14px"><button class="btn ghost" data-action="close-modal">Done</button></div>`;

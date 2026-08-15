@@ -1,5 +1,5 @@
 /**
- * Shopping App — home-device price feeder (v0.24)
+ * Shopping App — home-device price feeder (v0.25)
  * ================================================================
  * Runs on an always-on device on your RESIDENTIAL IP, so it sails past the
  * bot walls (Akamai / Incapsula) that block datacenter IPs. A real Chromium
