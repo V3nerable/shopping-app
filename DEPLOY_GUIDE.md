@@ -3,7 +3,7 @@
 Follow these steps in order. You currently have nothing set up — no GitHub
 account/repo, no Netlify. This takes you from zero to a live app on your phone.
 
-**App version: v0.10 · Everything ships in `Shopping-App-v0.10.zip`**
+**App version: v0.23 · Everything ships in `Shopping-App-v0.23.zip`**
 
 ---
 
@@ -11,13 +11,13 @@ account/repo, no Netlify. This takes you from zero to a live app on your phone.
 
 - A free **GitHub** account → https://github.com/signup
 - A free **Netlify** account → https://app.netlify.com/signup (sign up with your GitHub account — it makes Step 5 one click)
-- The file `Shopping-App-v0.10.zip` (download it from the workspace)
+- The file `Shopping-App-v0.23.zip` (download it from the workspace)
 
 ---
 
 ## Step 1 — Download & unzip the app
 
-1. Download `Shopping-App-v0.10.zip` and unzip it.
+1. Download `Shopping-App-v0.23.zip` and unzip it.
 2. You'll get a folder containing:
    - `pwa/` — the app itself
    - `scraper/` — the nightly price scraper
@@ -57,7 +57,7 @@ method in Step 3 (Option B), which picks them up automatically.
 # inside the unzipped folder (where pwa/, scraper/, .github/ live)
 git init
 git add .
-git commit -m "Shopping App v0.10"
+git commit -m "Shopping App v0.23"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/shopping-app.git
 git push -u origin main
@@ -114,7 +114,7 @@ servers, so add a session cookie from your own browser once:
    - **Recipes tab** → paste `500g chicken breast, 2 cups rice, 1 broccoli head` → **Parse** → **Save as recipe**.
    - **Plan tab** → assign the recipe to a couple of days.
    - **Shop tab** → you should see a grouped list with totals, per-store prices, and "Save $X vs Store" notes.
-   - **More tab** → confirm **v0.10** is shown at the bottom.
+   - **More tab** → confirm **v0.23** is shown at the bottom.
 3. If anything looks off, try a hard refresh (or incognito) — the service worker caches aggressively by design.
 
 ---
